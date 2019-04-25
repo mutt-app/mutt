@@ -1,53 +1,152 @@
-const puppeteer = require('puppeteer');
+// puppeteer-extra is a drop-in replacement for puppeteer,
+// it augments the installed puppeteer with plugin functionality
+const puppeteer = require("puppeteer-extra")
 
+// add stealth plugin and use defaults (all evasion techniques)
+const pluginStealth = require("puppeteer-extra-plugin-stealth")
+puppeteer.use(pluginStealth())
 
-(async () => {
+// puppeteer usage as normal
+puppeteer.launch({ headless: false, slowMo: 20 }).then(async browser => {
+  const page = await browser.newPage()
+  await page.setViewport({ width: 1180, height: 1000 })
+
   const screenshot = 'skyscanner.png'
-  try {
+  const departDate = '2019-05-13'
+  const returnDate = '2019-05-17'
 
-    const browser = await puppeteer.launch({
-      headless: false,
-      defaultViewport: {
-        width: 1280,
-        height: 800
-      },
-    })
-    const page = await browser.newPage()
-    await page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36")
-
-    // Going to scyscanner
-    await page.goto('https://skyscanner.com?currency=USD&market=US&locale=en-US')
-
-    // Typing origin
-    await page.waitForSelector('#fsc-origin-search')
-    await page.evaluate((selector) => document.querySelector(selector).click(), '#fsc-origin-search')
-    await page.type('#fsc-origin-search', 'HKT')
-    await page.keyboard.press('Tab')
-
-    // Typing destination
-    await page.waitForSelector('#fsc-destination-search')
-    await page.evaluate((selector) => document.querySelector(selector).click(), '#fsc-destination-search')
-    await page.type('#fsc-destination-search', 'MOW')
-    await page.keyboard.press('Tab')
+  // Going to scyscanner
+  await page.goto('https://skyscanner.com?currency=USD&market=US&locale=en-US')
 
 
-    // Opening calendar
-    await page.evaluate((selector) => document.querySelector(selector).click(), '#depart-fsc-datepicker-button')
-    await page.screenshot({
-      path: 'skyscanner.png'
-    })
-    await page.waitForSelector('#depart-calendar__bpk_calendar_nav_select')
+  await delay(1000)
+  // Typing origin
+  await page.waitForSelector('#fsc-origin-search')
+  await page.evaluate((selector) => document.querySelector(selector).click(), '#fsc-origin-search')
+  await page.focus('#fsc-origin-search')
+  await page.keyboard.press('Backspace')
+  await page.type('#fsc-origin-search', 'HKT')
+  await page.keyboard.press('Tab')
 
-    await page.select('#depart-calendar__bpk_calendar_nav_select', '2019-05')
+  // Typing destination
+  await page.waitForSelector('#fsc-destination-search')
+  await page.evaluate((selector) => document.querySelector(selector).click(), '#fsc-destination-search')
+  await page.focus('#fsc-destination-search')
+  await page.keyboard.press('Backspace')
+  await page.type('#fsc-destination-search', 'MOW')
+  await page.keyboard.press('Tab')
 
 
-    await page.screenshot({
-      path: 'skyscanner1.png'
-    })
-    await browser.close()
-    console.log('See screenshot: ' + screenshot)
 
-  } catch (err) {
-    console.error(err)
+  // Choosing first segment
+  // Opening calendar
+  await page.evaluate((selector) => document.querySelector(selector).click(), '#depart-fsc-datepicker-button')
+  await page.waitForSelector('#depart-calendar__bpk_calendar_nav_select')
+
+  // Cut first 0 from depart day
+  let departDay = departDate.substr(8,2)
+  if (departDay.substr(0,1) === '0') {
+    departDay = departDay.substr(1,1)
   }
-})()
+
+  // Select correct month/year  in calendar
+  await page.select('#depart-calendar__bpk_calendar_nav_select', departDate.substr(0, 7))
+
+  // Select correct day in calendar
+  const dates = await page.$$('button[class^="bpk-calendar-date_bpk-calendar-date"]')
+  for (let i=0; i < dates.length; i++) {
+    let className = await page.evaluate(
+      date => date.getAttribute('class'),
+      dates[i],
+    );
+
+    if (className.includes("outside") || className.includes("blocked")) {
+      continue
+    }
+
+    let buttonSpan = await dates[i].$('span')
+    let val = await page.evaluate(
+      span => span.innerText,
+      buttonSpan,
+    );
+
+    if (val === departDay) {
+      dates[i].click()
+    }
+  }
+
+  if (returnDate !== '') {
+    // Choosing second segment
+    // Opening calendar
+    await page.evaluate((selector) => document.querySelector(selector).click(), '#return-fsc-datepicker-button')
+    await page.waitForSelector('#return-calendar__bpk_calendar_nav_select')
+
+    // Cut first 0 from depart day
+    let returnDay = returnDate.substr(8,2)
+    if (returnDay.substr(0,1) === '0') {
+      returnDay = departDay.substr(1,1)
+    }
+
+    // Select correct month/year  in calendar
+    await page.select('#return-calendar__bpk_calendar_nav_select', returnDate.substr(0, 7))
+
+    // Select correct day in calendar
+    const dates = await page.$$('button[class^="bpk-calendar-date_bpk-calendar-date"]')
+    for (let i=0; i < dates.length; i++) {
+      let className = await page.evaluate(
+        date => date.getAttribute('class'),
+        dates[i],
+      );
+
+      if (className.includes("outside") || className.includes("blocked")) {
+        continue
+      }
+
+      let buttonSpan = await dates[i].$('span')
+      let val = await page.evaluate(
+        span => span.innerText,
+        buttonSpan,
+      );
+
+      if (val === returnDay) {
+        dates[i].click()
+      }
+    }
+  }
+
+  const buttons = await page.$$('button[class^="bpk-button_bpk-button"]')
+  for (let i=0; i < buttons.length; i++) {
+    let ariaLabel = await page.evaluate(
+      button => button.getAttribute('aria-label'),
+      buttons[i],
+    );
+
+    if (ariaLabel !== null && ariaLabel.toString() === 'Search flights') {
+      buttons[i].click()
+    }
+  }
+
+  await page.waitForSelector('#header-list-count')
+  await page.$('#tab:nth-child(2).fqs-price')
+  let cheapestPrice = await page.evaluate(
+    price => price.getAttribute('value'),
+    page.$('#tab:nth-child(2).fqs-price'),
+  );
+
+  console.log(cheapestPrice)
+
+  await delay(20000)
+  await page.screenshot({
+    path: screenshot
+  })
+  await browser.close()
+  console.log('See screenshot: ' + screenshot)
+})
+
+
+
+function delay(time) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, time)
+  });
+}
