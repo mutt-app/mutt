@@ -112,7 +112,7 @@ puppeteer.launch({headless: false, slowMo: 33}).then(async browser => {
 
   console.log('Total price:', cheapestReturnPrice)
 
-  //browser.close()
+  await browser.close()
 })
 
 /**

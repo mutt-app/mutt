@@ -116,6 +116,7 @@ puppeteer.launch({ headless: false, slowMo: 33 }).then(async browser => {
   }
 
   console.log(minDepartPrice + minReturnPrice)
+  await browser.close()
   return minDepartPrice + minReturnPrice
 })
 
