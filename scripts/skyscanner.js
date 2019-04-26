@@ -6,8 +6,19 @@ const puppeteer = require("puppeteer-extra")
 const pluginStealth = require("puppeteer-extra-plugin-stealth")
 puppeteer.use(pluginStealth())
 
+function getChromiumExecPath() {
+  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked');
+}
+
+function createBrowser(options = {}) {
+  return puppeteer.launch({
+    ...options,
+    executablePath: getChromiumExecPath()
+  });
+}
+
 // puppeteer usage as normal
-puppeteer.launch({headless: false, slowMo: 20}).then(async browser => {
+createBrowser({headless: false, slowMo: 20}).then(async browser => {
   const page = await browser.newPage()
   await page.setViewport({width: 1180, height: 1000})
 
