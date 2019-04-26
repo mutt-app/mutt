@@ -5,6 +5,9 @@ const scripts = [
   'southwest',
   'skyscanner',
   'delta',
+    'aviasales',
+    'kayak',
+    'airasia'
 ]
 exports.scripts = scripts
 
