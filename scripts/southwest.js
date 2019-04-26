@@ -9,15 +9,17 @@ puppeteer.use(pluginStealth())
 // puppeteer usage as normal
 puppeteer.launch({ headless: false, slowMo: 33 }).then(async browser => {
   const page = await browser.newPage()
+  // TODO: make width/height random 1000-1200
   await page.setViewport({width: 1180, height: 1080})
+  // TODO: choose 1 of the popular useragents
+  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36')
+
 
   // Going to southwest
   await page.goto('https://www.southwest.com/')
 
 
   // TODO: try to type origin/destination in for and check valid typing
-
-
   // Typing origin
   await page.waitForSelector('#LandingPageAirSearchForm_originationAirportCode')
   await delay(500)
@@ -84,17 +86,37 @@ puppeteer.launch({ headless: false, slowMo: 33 }).then(async browser => {
 
 
   await page.waitForSelector('.filters--filter-area')
-  const prices = await page.$$('.fare-button--value-total')
-  for (let i = 0; i < prices.length; i++) {
+
+  // Getting min depart price
+  let minDepartPrice = 0
+  const departPrices = await page.$$('div[id^="air-booking-fares-0"] .fare-button_primary-yellow .fare-button--value-total')
+  for (let i = 0; i < departPrices.length; i++) {
     let val = await page.evaluate(
       span => span.innerText,
-      prices[i],
+      departPrices[i],
     )
-    console.log(val)
+    let price = parseInt(val)
+    if (minDepartPrice === 0 || minDepartPrice > price){
+      minDepartPrice = price
+    }
   }
 
+  let minReturnPrice = 0
+  const returnPrices = await page.$$('div[id^="air-booking-fares-1"] .fare-button_primary-yellow .fare-button--value-total')
+  for (let i = 0; i < returnPrices.length; i++) {
+    let val = await page.evaluate(
+      span => span.innerText,
+      returnPrices[i],
+    )
 
-  await delay(10000)
+    let price = parseInt(val)
+    if (minReturnPrice === 0 || minReturnPrice > price){
+      minReturnPrice = price
+    }
+  }
+
+  console.log(minDepartPrice + minReturnPrice)
+  return minDepartPrice + minReturnPrice
 })
 
 
