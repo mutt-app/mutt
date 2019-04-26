@@ -1,27 +1,6 @@
-const puppeteer = require('puppeteer-extra')
+const {delay, parsePrice} = require('.')
 
-puppeteer.use(require('puppeteer-extra-plugin-stealth')())
-
-function getChromiumExecPath() {
-  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked');
-}
-
-function createBrowser(options = {}) {
-  return puppeteer.launch({
-    ...options,
-    executablePath: getChromiumExecPath()
-  });
-}
-
-createBrowser({headless: false, slowMo: 33}).then(async browser => {
-  const page = await browser.newPage()
-  await page.setViewport({width: 1180, height: 1000})
-
-  const origin = 'NYC'
-  const destination = 'LAX'
-  const departDate = new Date('2019-05-13')
-  const returnDate = new Date('2019-05-17')
-
+module.exports = async ({page, origin, destination, departDate, returnDate}) => {
   await page.goto('https://www.delta.com/')
 
   // Typing origin
@@ -121,19 +100,7 @@ createBrowser({headless: false, slowMo: 33}).then(async browser => {
     }
   }
 
-  console.log('Total price:', cheapestReturnPrice)
-
-  await browser.close()
-})
-
-/**
- * @param {number} time
- * @returns {Promise<any>}
- */
-function delay(time) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, time)
-  })
+  return cheapestReturnPrice
 }
 
 /**
@@ -143,14 +110,4 @@ function delay(time) {
 function getLongMonthName(date) {
   const mlist = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   return mlist[date.getMonth()]
-}
-
-/**
- *
- * @param price
- * @returns {number}
- */
-function parsePrice(price) {
-  const s = price.replace(/\D/g, '')
-  return parseInt(s)
 }

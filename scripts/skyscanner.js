@@ -1,30 +1,8 @@
-// puppeteer-extra is a drop-in replacement for puppeteer,
-// it augments the installed puppeteer with plugin functionality
-const puppeteer = require("puppeteer-extra")
+const {delay, parsePrice} = require('.')
 
-// add stealth plugin and use defaults (all evasion techniques)
-const pluginStealth = require("puppeteer-extra-plugin-stealth")
-puppeteer.use(pluginStealth())
-
-function getChromiumExecPath() {
-  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked');
-}
-
-function createBrowser(options = {}) {
-  return puppeteer.launch({
-    ...options,
-    executablePath: getChromiumExecPath()
-  });
-}
-
-// puppeteer usage as normal
-createBrowser({headless: false, slowMo: 20}).then(async browser => {
-  const page = await browser.newPage()
-  await page.setViewport({width: 1180, height: 1000})
-
-  const screenshot = 'skyscanner.png'
-  const departDate = '2019-05-13'
-  const returnDate = '2019-05-17'
+module.exports = async ({page, origin, destination, departDate, returnDate}) => {
+  const departDateString = toISOString(departDate)
+  const returnDateString = toISOString(returnDate)
 
   // Going to scyscanner
   await page.goto('https://skyscanner.com?currency=USD&market=US&locale=en-US')
@@ -36,7 +14,7 @@ createBrowser({headless: false, slowMo: 20}).then(async browser => {
   await page.evaluate((selector) => document.querySelector(selector).click(), '#fsc-origin-search')
   await page.focus('#fsc-origin-search')
   await page.keyboard.press('Backspace')
-  await page.type('#fsc-origin-search', 'HKT')
+  await page.type('#fsc-origin-search', origin)
   await page.keyboard.press('Tab')
 
   // Typing destination
@@ -44,7 +22,7 @@ createBrowser({headless: false, slowMo: 20}).then(async browser => {
   await page.evaluate((selector) => document.querySelector(selector).click(), '#fsc-destination-search')
   await page.focus('#fsc-destination-search')
   await page.keyboard.press('Backspace')
-  await page.type('#fsc-destination-search', 'MOW')
+  await page.type('#fsc-destination-search', destination)
   await page.keyboard.press('Tab')
 
 
@@ -54,13 +32,13 @@ createBrowser({headless: false, slowMo: 20}).then(async browser => {
   await page.waitForSelector('#depart-calendar__bpk_calendar_nav_select')
 
   // Cut first 0 from depart day
-  let departDay = departDate.substr(8, 2)
+  let departDay = departDateString.substr(8, 2)
   if (departDay.substr(0, 1) === '0') {
     departDay = departDay.substr(1, 1)
   }
 
   // Select correct month/year  in calendar
-  await page.select('#depart-calendar__bpk_calendar_nav_select', departDate.substr(0, 7))
+  await page.select('#depart-calendar__bpk_calendar_nav_select', departDateString.substr(0, 7))
 
   // Select correct day in calendar
   const dates = await page.$$('button[class^="bpk-calendar-date_bpk-calendar-date"]')
@@ -85,20 +63,20 @@ createBrowser({headless: false, slowMo: 20}).then(async browser => {
     }
   }
 
-  if (returnDate !== '') {
+  if (returnDateString !== '') {
     // Choosing second segment
     // Opening calendar
     await page.evaluate((selector) => document.querySelector(selector).click(), '#return-fsc-datepicker-button')
     await page.waitForSelector('#return-calendar__bpk_calendar_nav_select')
 
     // Cut first 0 from depart day
-    let returnDay = returnDate.substr(8, 2)
+    let returnDay = returnDateString.substr(8, 2)
     if (returnDay.substr(0, 1) === '0') {
       returnDay = departDay.substr(1, 1)
     }
 
     // Select correct month/year  in calendar
-    await page.select('#return-calendar__bpk_calendar_nav_select', returnDate.substr(0, 7))
+    await page.select('#return-calendar__bpk_calendar_nav_select', returnDateString.substr(0, 7))
 
     // Select correct day in calendar
     const dates = await page.$$('button[class^="bpk-calendar-date_bpk-calendar-date"]')
@@ -140,13 +118,16 @@ createBrowser({headless: false, slowMo: 20}).then(async browser => {
   const cheapestPriceElement = await page.$('[data-tab="price"] .fqs-price')
   const price = await (await cheapestPriceElement.getProperty('textContent')).jsonValue()
 
-  console.log(price)
-  await browser.close()
-})
+  return parsePrice(price)
+}
 
+function pad(number) {
+  if (number < 10) {
+    return '0' + number;
+  }
+  return number;
+}
 
-function delay(time) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, time)
-  })
+function toISOString(date) {
+  return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate())
 }

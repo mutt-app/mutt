@@ -1,30 +1,8 @@
-// puppeteer-extra is a drop-in replacement for puppeteer,
-// it augments the installed puppeteer with plugin functionality
-const puppeteer = require("puppeteer-extra")
+const {delay} = require('.')
 
-// add stealth plugin and use defaults (all evasion techniques)
-const pluginStealth = require("puppeteer-extra-plugin-stealth")
-puppeteer.use(pluginStealth())
-
-function getChromiumExecPath() {
-  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked');
-}
-
-function createBrowser(options = {}) {
-  return puppeteer.launch({
-    ...options,
-    executablePath: getChromiumExecPath()
-  });
-}
-
-// puppeteer usage as normal
-createBrowser({ headless: false, slowMo: 33 }).then(async browser => {
-  const page = await browser.newPage()
-  // TODO: make width/height random 1000-1200
-  await page.setViewport({width: 1180, height: 1080})
+module.exports = async ({page, origin, destination, departDate, returnDate}) => {
   // TODO: choose 1 of the popular useragents
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36')
-
 
   // Going to southwest
   await page.goto('https://www.southwest.com/')
@@ -38,7 +16,7 @@ createBrowser({ headless: false, slowMo: 33 }).then(async browser => {
   await page.focus('#LandingPageAirSearchForm_originationAirportCode')
   await page.keyboard.press('Backspace')
   await delay(200)
-  await page.type('#LandingPageAirSearchForm_originationAirportCode', 'NYC')
+  await page.type('#LandingPageAirSearchForm_originationAirportCode', origin)
   await delay(200)
   await page.keyboard.press('Tab')
   await delay(200)
@@ -51,10 +29,9 @@ createBrowser({ headless: false, slowMo: 33 }).then(async browser => {
   await page.focus('#LandingPageAirSearchForm_destinationAirportCode')
   await page.keyboard.press('Backspace')
   await delay(200)
-  await page.type('#LandingPageAirSearchForm_destinationAirportCode', 'LAX')
+  await page.type('#LandingPageAirSearchForm_destinationAirportCode', destination)
   await delay(200)
   await page.keyboard.press('Tab')
-
 
 
   // Typing depart date in calendar
@@ -64,7 +41,7 @@ createBrowser({ headless: false, slowMo: 33 }).then(async browser => {
   await page.focus('#LandingPageAirSearchForm_departureDate')
   await page.keyboard.press('Backspace')
   await delay(200)
-  await page.type('#LandingPageAirSearchForm_departureDate', '5/12')
+  await page.type('#LandingPageAirSearchForm_departureDate', toDate(departDate))
   await delay(200)
   await page.keyboard.press('Tab')
 
@@ -75,7 +52,7 @@ createBrowser({ headless: false, slowMo: 33 }).then(async browser => {
   await page.focus('#LandingPageAirSearchForm_returnDate')
   await page.keyboard.press('Backspace')
   await delay(200)
-  await page.type('#LandingPageAirSearchForm_returnDate', '6/01')
+  await page.type('#LandingPageAirSearchForm_returnDate', toDate(returnDate))
   await delay(200)
   await page.keyboard.press('Tab')
 
@@ -94,8 +71,6 @@ createBrowser({ headless: false, slowMo: 33 }).then(async browser => {
   await page.evaluate((selector) => document.querySelector(selector).click(), '#LandingPageAirSearchForm_submit-button')
 
 
-
-
   await page.waitForSelector('.filters--filter-area')
 
   // Getting min depart price
@@ -107,7 +82,7 @@ createBrowser({ headless: false, slowMo: 33 }).then(async browser => {
       departPrices[i],
     )
     let price = parseInt(val)
-    if (minDepartPrice === 0 || minDepartPrice > price){
+    if (minDepartPrice === 0 || minDepartPrice > price) {
       minDepartPrice = price
     }
   }
@@ -121,19 +96,22 @@ createBrowser({ headless: false, slowMo: 33 }).then(async browser => {
     )
 
     let price = parseInt(val)
-    if (minReturnPrice === 0 || minReturnPrice > price){
+    if (minReturnPrice === 0 || minReturnPrice > price) {
       minReturnPrice = price
     }
   }
 
-  console.log(minDepartPrice + minReturnPrice)
-  await browser.close()
   return minDepartPrice + minReturnPrice
-})
-
-
-function delay(time) {
-  return new Promise(function(resolve) {
-    setTimeout(resolve, time)
-  });
 }
+
+function pad(number) {
+  if (number < 10) {
+    return '0' + number
+  }
+  return number
+}
+
+function toDate(date) {
+  return (date.getMonth() + 1) + '/' + pad(date.getDate())
+}
+
