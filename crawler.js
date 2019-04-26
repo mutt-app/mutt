@@ -6,6 +6,7 @@ const scripts = [
   'skyscanner',
   'delta',
 ]
+exports.scripts = scripts
 
 exports.crawlAll = function crawlAll(subscription, onPrice, options = {}) {
     for (let script of scripts) {
@@ -13,11 +14,12 @@ exports.crawlAll = function crawlAll(subscription, onPrice, options = {}) {
     }
 }
 
-async function crawl(subscription, script, onPrice, options = {}) {
+exports.crawl = async function crawl(subscription, script, onPrice, options = {}) {
   console.log(`Starting crawling ${script} for subscription #${subscription.id} (${subscription.origin}→${subscription.destination}).`)
 
   options = {
     headless: true,
+    close: true,
     ...options
   }
 
@@ -38,7 +40,9 @@ async function crawl(subscription, script, onPrice, options = {}) {
     console.error(`Error in ${script}!`)
     throw e
   } finally {
-    browser.close()
+    if (options.close) {
+      browser.close()
+    }
   }
 
   console.log(`Price from ${script} (${subscription.origin}→${subscription.destination}): $${price}`)

@@ -195,7 +195,7 @@
 <div id="root"></div>
 
 <script type="text/babel">
-  const {crawlAll} = require('../crawler.js')
+  const {crawl, crawlAll, scripts} = require('../crawler.js')
   const {createAddWindow} = require('./addSubscription.js')
   const {ipcRenderer, remote} = require('electron')
   const classnames = require('classnames')
@@ -284,6 +284,7 @@
     }
 
     handlePrice = ({script, price, id}) => {
+      this.get(id).timeAgo = new Date()
       this.get(id).prices[script] = price
       this.save()
     }
@@ -358,7 +359,7 @@
       }
 
       return (
-        <tr className={classnames('flex-table row', {'inactive': !active})}>
+        <tr className={classnames('flex-table row', {'inactive': !active})} onContextMenu={this.handleMenu}>
           <td>
             {!active
               ? <img src="icons/play.svg" alt="" className="play-pause" onClick={e => onActivate(e, id)}/>
@@ -438,6 +439,21 @@
 
     handleMore = (event) => {
       this.setState({expanded: !this.state.expanded})
+    }
+
+    handleMenu = (event) => {
+      const {Menu, MenuItem} = remote
+
+      const menu = new Menu()
+      for (let script of scripts) {
+        menu.append(new MenuItem({
+          label: `Inspect ${script}`,
+          click: () => crawl(this.props, script, () => {}, {headless: false, close: false}),
+        }))
+      }
+
+      event.preventDefault()
+      menu.popup({window: remote.getCurrentWindow()})
     }
   }
 

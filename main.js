@@ -7,7 +7,7 @@ const path = require('path')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1000,
@@ -38,7 +38,7 @@ function createWindow () {
 }
 
 ipcMain.on('add_subscription', function (e, item) {
-  mainWindow.webContents.send('add_subscription', item);
+  mainWindow.webContents.send('add_subscription', item)
 })
 
 // This method will be called when Electron has finished
