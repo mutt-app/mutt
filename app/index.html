@@ -1,21 +1,262 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8">
     <title>Mutt</title>
-  </head>
-  <body>
-    <h1>Hello Mutt!</h1>
-    <button type="button" onclick="createAddWindow()" value="Add subscription">
-      Add subscription
-    </button>
-    <ul></ul>
+    <script src="https://unpkg.com/react@16.8/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16.8/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <style>
+        html {
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 14px;
+            color: #122129;
+        }
 
-    <script>
-      require('./index.js')
-      // You can also require other files to run in this process
-      //require('../crawler.js')
-      require('./addSubscription.js')
-    </script>
-  </body>
+        *, *:before, *:after {
+            box-sizing: inherit;
+            margin: 0;
+            padding: 0;
+        }
+
+        .table-container {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 0.5em;
+        }
+
+        th {
+            color: white;
+            padding: 0.5em;
+            text-align: left;
+        }
+
+        th:first-child {
+            text-align: center;
+        }
+
+        @media only screen and (max-width: 767px) {
+            th, td {
+                width: auto;
+                display: block;
+                border: 0;
+            }
+
+            .flex-row {
+                width: 100%;
+            }
+        }
+
+        .header {
+            height: 30px;
+            background: #355A6F;
+            text-transform: uppercase;
+
+        }
+
+        th {
+            text-transform: uppercase;
+            color: white;
+            font-size: 12px;
+        }
+
+        .play-pause {
+            margin: 22px;
+        }
+
+        .route {
+            display: inline-flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .route .origin {
+            margin-right: 10px;
+        }
+
+        .route .destination {
+            margin-left: 10px;
+        }
+
+        .dates {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 14px;
+            line-height: 19px;
+        }
+
+        .price-found {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 14px;
+            line-height: 19px;
+        }
+
+        .agency {
+            font-size: 14px;
+            line-height: 19px;
+        }
+
+        .agency-more {
+            font-size: 12px;
+            line-height: 16px;
+            color: #779EB3;
+        }
+
+        .agency-more > img {
+            margin-left: 3px;
+        }
+
+        .best-price {
+            display: flex;
+            flex-direction: row;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 26px;
+            line-height: 35px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .best-price > img {
+            margin-right: 5px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .controls > * + * {
+            margin-left: 20px;
+        }
+
+        .btn {
+            width: 137px;
+            height: 36px;
+            line-height: 36px;
+            background: #FFC045;
+            border-radius: 150px;
+            font-size: 12px;
+            text-align: center;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+  require('./index.js')
+  //require('../crawler.js')
+  require('./addSubscription.js')
+
+  const subscriptions = [{
+    id: 0,
+    origin: 'NYC',
+    destination: 'LAX',
+    departDate: new Date('2019-05-13'),
+    returnDate: new Date('2019-05-17'),
+  }]
+
+  class App extends React.Component {
+    constructor(props) {
+      super(props)
+      this.state = {
+        subscriptions: subscriptions,
+      }
+    }
+
+    render() {
+      const {subscriptions} = this.state
+      return (
+        <table className="table-container">
+          <thead>
+          <tr className="flex-table header">
+            <th className="flex-row">Route</th>
+            <th className="flex-row">Date</th>
+            <th className="flex-row">Price found</th>
+            <th className="flex-row">Agency</th>
+            <th className="flex-row">Best price</th>
+            <th className="flex-row">&nbsp;</th>
+          </tr>
+          </thead>
+          <tbody>
+          {subscriptions.map(s => <Subscription key={s.id} {...s}/>)}
+          </tbody>
+        </table>
+      )
+    }
+  }
+
+  class Subscription extends React.Component {
+    render() {
+      const {id, origin, destination, departDate, returnDate} = this.props
+      return (
+        <tr className="flex-table row">
+          <td className="flex-row">
+            <div className="route">
+              <img src="icons/play.svg" alt="" className="play-pause"/>
+              <div className="origin">{origin}</div>
+              <img src="./icons/planes.svg" alt=""/>
+              <div className="destination">{destination}</div>
+            </div>
+          </td>
+
+          <td className="dates flex-row">
+            <div>{getLongMonthName(departDate)} {departDate.getDate()}</div>
+            <div>{getLongMonthName(departDate)} {returnDate.getDate()}</div>
+          </td>
+
+          <td className="price-found flex-row">
+            15 min ago
+          </td>
+
+          <td className="agency flex-row">
+            <div className="agency">delta.com</div>
+            <div className="agency-more">
+              Check other deals <img src="icons/more.svg" alt=""/>
+            </div>
+          </td>
+
+          <td className="flex-row">
+            <div className="best-price">
+              <img src="icons/notify.svg" alt=""/>
+              <div className="value">$391</div>
+            </div>
+          </td>
+
+          <td className="flex-row">
+            <div className="controls">
+              <div className="btn">View details</div>
+              <img src="icons/delete.svg" alt=""/>
+            </div>
+          </td>
+        </tr>
+      )
+    }
+  }
+
+  function getLongMonthName(date) {
+    const mlist = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    return mlist[date.getMonth()]
+  }
+
+  // Start app
+  const domContainer = document.querySelector('#root')
+  ReactDOM.render(
+    <App/>
+    , domContainer)
+</script>
+</body>
 </html>

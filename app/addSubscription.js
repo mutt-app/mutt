@@ -1,4 +1,4 @@
-const electron = require('electron/electron');
+const electron = require('electron');
 const BrowserWindow = electron.remote.BrowserWindow;
 const url = require('url')
 const path = require('path')
