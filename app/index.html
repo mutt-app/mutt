@@ -67,6 +67,14 @@
             font-size: 12px;
         }
 
+        .row.inactive {
+            color: #B8BCBF;
+        }
+
+        .row.inactive img {
+            opacity: 0.5;
+        }
+
         .play-pause {
             margin-left: 15px;
         }
@@ -150,6 +158,11 @@
             text-align: center;
             letter-spacing: 0.1em;
             text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        img {
+            cursor: pointer;
         }
 
         .add-subscription {
@@ -164,16 +177,20 @@
 <div id="root"></div>
 
 <script type="text/babel">
-  require('./index.js')
   //require('../crawler.js')
   require('./addSubscription.js')
+  const {ipcRenderer} = require('electron')
+  const classnames = require('classnames')
+  const {default: TimeAgo} = require('react-timeago')
 
   const subscriptions = [{
     id: 0,
+    active: true,
     origin: 'NYC',
     destination: 'LAX',
     departDate: new Date('2019-05-13'),
     returnDate: new Date('2019-05-17'),
+    timeAgo: new Date(),
   }]
 
   class App extends React.Component {
@@ -201,7 +218,10 @@
             </tr>
             </thead>
             <tbody>
-            {subscriptions.map(s => <Subscription key={s.id} {...s}/>)}
+            {subscriptions.map(s => <Subscription key={s.id} {...s}
+                                                  onDelete={this.handleDelete}
+                                                  onActivate={this.handleActivate}
+            />)}
             </tbody>
           </table>
 
@@ -213,21 +233,57 @@
     handleAdd = () => {
       window.createAddWindow()
     }
+
+    handleDelete = (event, id) => {
+      this.setState({subscriptions: [...this.state.subscriptions.filter(s => s.id !== id)]})
+    }
+
+    handleActivate = (event, id) => {
+      for (let s of this.state.subscriptions) {
+        if (s.id === id) {
+          s.active = !s.active
+        }
+      }
+      this.setState({subscriptions: [...this.state.subscriptions]})
+    }
+
+    componentDidMount() {
+      ipcRenderer.on('add_subscription', (event, form) => {
+        const s = {}
+        for (const {name, value} of form) {
+          s[name] = value
+        }
+
+        s.id = this.state.subscriptions.length + 1
+        s.active = true
+        s.departDate = new Date(s.departDate)
+        s.returnDate = new Date(s.returnDate)
+
+        this.setState({subscriptions: [...this.state.subscriptions, s]})
+      })
+    }
   }
 
   class Subscription extends React.Component {
     render() {
-      const {id, origin, destination, departDate, returnDate} = this.props
+      const {
+        id,
+        origin, destination, departDate, returnDate,
+        active, timeAgo, agency, price,
+        onDelete, onActivate,
+      } = this.props
       return (
-        <tr className="flex-table row">
+        <tr className={classnames('flex-table row', {'inactive': !active})}>
           <td className="flex-row">
-            <img src="icons/play.svg" alt="" className="play-pause"/>
+            {active
+              ? <img src="icons/play.svg" alt="" className="play-pause" onClick={e => onActivate(e, id)}/>
+              : <img src="icons/pause.svg" alt="" className="play-pause" onClick={e => onActivate(e, id)}/>}
           </td>
           <td className="flex-row">
             <div className="route">
-              <div className="origin">{origin}</div>
+              <div className="origin">{origin.toUpperCase()}</div>
               <img src="./icons/planes.svg" alt=""/>
-              <div className="destination">{destination}</div>
+              <div className="destination">{destination.toUpperCase()}</div>
             </div>
           </td>
 
@@ -237,11 +293,11 @@
           </td>
 
           <td className="price-found flex-row">
-            15 min ago
+            {timeAgo && <TimeAgo date={timeAgo.toUTCString()}/>}
           </td>
 
           <td className="agency flex-row">
-            <div className="agency">delta.com</div>
+            <div className="agency">{agency}</div>
             <div className="agency-more">
               Check other deals <img src="icons/more.svg" alt=""/>
             </div>
@@ -250,14 +306,14 @@
           <td className="flex-row">
             <div className="best-price">
               <img src="icons/notify.svg" alt=""/>
-              <div className="value">$391</div>
+              <div className="value">${price}</div>
             </div>
           </td>
 
           <td className="flex-row">
             <div className="controls">
               <div className="btn">View details</div>
-              <img src="icons/delete.svg" alt=""/>
+              <img src="icons/delete.svg" alt="" onClick={e => onDelete(e, id)}/>
             </div>
           </td>
         </tr>
