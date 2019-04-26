@@ -7,9 +7,9 @@ const pluginStealth = require("puppeteer-extra-plugin-stealth")
 puppeteer.use(pluginStealth())
 
 // puppeteer usage as normal
-puppeteer.launch({ headless: false, slowMo: 20 }).then(async browser => {
+puppeteer.launch({headless: false, slowMo: 20}).then(async browser => {
   const page = await browser.newPage()
-  await page.setViewport({ width: 1180, height: 1000 })
+  await page.setViewport({width: 1180, height: 1000})
 
   const screenshot = 'skyscanner.png'
   const departDate = '2019-05-13'
@@ -37,16 +37,15 @@ puppeteer.launch({ headless: false, slowMo: 20 }).then(async browser => {
   await page.keyboard.press('Tab')
 
 
-
   // Choosing first segment
   // Opening calendar
   await page.evaluate((selector) => document.querySelector(selector).click(), '#depart-fsc-datepicker-button')
   await page.waitForSelector('#depart-calendar__bpk_calendar_nav_select')
 
   // Cut first 0 from depart day
-  let departDay = departDate.substr(8,2)
-  if (departDay.substr(0,1) === '0') {
-    departDay = departDay.substr(1,1)
+  let departDay = departDate.substr(8, 2)
+  if (departDay.substr(0, 1) === '0') {
+    departDay = departDay.substr(1, 1)
   }
 
   // Select correct month/year  in calendar
@@ -54,11 +53,11 @@ puppeteer.launch({ headless: false, slowMo: 20 }).then(async browser => {
 
   // Select correct day in calendar
   const dates = await page.$$('button[class^="bpk-calendar-date_bpk-calendar-date"]')
-  for (let i=0; i < dates.length; i++) {
+  for (let i = 0; i < dates.length; i++) {
     let className = await page.evaluate(
       date => date.getAttribute('class'),
       dates[i],
-    );
+    )
 
     if (className.includes("outside") || className.includes("blocked")) {
       continue
@@ -68,7 +67,7 @@ puppeteer.launch({ headless: false, slowMo: 20 }).then(async browser => {
     let val = await page.evaluate(
       span => span.innerText,
       buttonSpan,
-    );
+    )
 
     if (val === departDay) {
       dates[i].click()
@@ -82,9 +81,9 @@ puppeteer.launch({ headless: false, slowMo: 20 }).then(async browser => {
     await page.waitForSelector('#return-calendar__bpk_calendar_nav_select')
 
     // Cut first 0 from depart day
-    let returnDay = returnDate.substr(8,2)
-    if (returnDay.substr(0,1) === '0') {
-      returnDay = departDay.substr(1,1)
+    let returnDay = returnDate.substr(8, 2)
+    if (returnDay.substr(0, 1) === '0') {
+      returnDay = departDay.substr(1, 1)
     }
 
     // Select correct month/year  in calendar
@@ -92,11 +91,11 @@ puppeteer.launch({ headless: false, slowMo: 20 }).then(async browser => {
 
     // Select correct day in calendar
     const dates = await page.$$('button[class^="bpk-calendar-date_bpk-calendar-date"]')
-    for (let i=0; i < dates.length; i++) {
+    for (let i = 0; i < dates.length; i++) {
       let className = await page.evaluate(
         date => date.getAttribute('class'),
         dates[i],
-      );
+      )
 
       if (className.includes("outside") || className.includes("blocked")) {
         continue
@@ -106,7 +105,7 @@ puppeteer.launch({ headless: false, slowMo: 20 }).then(async browser => {
       let val = await page.evaluate(
         span => span.innerText,
         buttonSpan,
-      );
+      )
 
       if (val === returnDay) {
         dates[i].click()
@@ -115,38 +114,28 @@ puppeteer.launch({ headless: false, slowMo: 20 }).then(async browser => {
   }
 
   const buttons = await page.$$('button[class^="bpk-button_bpk-button"]')
-  for (let i=0; i < buttons.length; i++) {
+  for (let i = 0; i < buttons.length; i++) {
     let ariaLabel = await page.evaluate(
       button => button.getAttribute('aria-label'),
       buttons[i],
-    );
+    )
 
     if (ariaLabel !== null && ariaLabel.toString() === 'Search flights') {
       buttons[i].click()
     }
   }
 
-  await page.waitForSelector('#header-list-count')
-  await page.$('#tab:nth-child(2).fqs-price')
-  let cheapestPrice = await page.evaluate(
-    price => price.getAttribute('value'),
-    page.$('#tab:nth-child(2).fqs-price'),
-  );
+  await delay(10000)
+  const cheapestPriceElement = await page.$('[data-tab="price"] .fqs-price')
+  const price = await (await cheapestPriceElement.getProperty('textContent')).jsonValue()
 
-  console.log(cheapestPrice)
-
-  await delay(20000)
-  await page.screenshot({
-    path: screenshot
-  })
+  console.log(price)
   await browser.close()
-  console.log('See screenshot: ' + screenshot)
 })
 
 
-
 function delay(time) {
-  return new Promise(function(resolve) {
+  return new Promise(function (resolve) {
     setTimeout(resolve, time)
-  });
+  })
 }
