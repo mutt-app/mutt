@@ -38,7 +38,6 @@ function createWindow () {
 }
 
 ipcMain.on('add_subscription', function (e, item) {
-  console.log(item)
   mainWindow.webContents.send('add_subscription', item);
 })
 

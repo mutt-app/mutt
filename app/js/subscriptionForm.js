@@ -6,8 +6,6 @@ form.addEventListener('submit', submitForm)
 
 function submitForm(e) {
   e.preventDefault()
-  console.log($(e.target).serializeArray())
-  const origin = document.querySelector('#origin').value
-  ipcRenderer.send('add_subscription', origin)
+  ipcRenderer.send('add_subscription', $(e.target).serializeArray())
   return true
 }
