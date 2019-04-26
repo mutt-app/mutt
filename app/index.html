@@ -241,6 +241,7 @@
                                                   onDelete={this.handleDelete}
                                                   onActivate={this.handleActivate}
                                                   onMute={this.handleNotify}
+                                                  onPrice={this.handlePrice}
             />)}
             </tbody>
           </table>
@@ -345,7 +346,7 @@
         id,
         origin, destination, departDate, returnDate,
         active, timeAgo, prices, notify,
-        onDelete, onActivate, onMute,
+        onDelete, onActivate, onMute, onPrice,
       } = this.props
 
       const {expanded} = this.state
@@ -448,7 +449,7 @@
       for (let script of scripts) {
         menu.append(new MenuItem({
           label: `Inspect ${script}`,
-          click: () => crawl(this.props, script, () => {}, {headless: false, close: false}),
+          click: () => crawl(this.props, script, this.props.onPrice, {headless: false, close: false}),
         }))
       }
 
