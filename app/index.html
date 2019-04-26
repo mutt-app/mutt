@@ -29,7 +29,8 @@
         }
 
         td {
-            padding: 0.5em;
+            vertical-align: top;
+            padding: 20px 0;
         }
 
         th {
@@ -40,15 +41,15 @@
             font-size: 12px;
         }
 
-        th:nth-child(2) {
-            text-align: center;
-        }
-
         .header {
             height: 30px;
             background: #355A6F;
             text-transform: uppercase;
 
+        }
+
+        .row {
+            border-bottom: 2px solid #E7EDF0;
         }
 
         .row.inactive {
@@ -69,6 +70,7 @@
             justify-content: space-evenly;
             align-items: center;
             font-size: 18px;
+            margin-top: 3px;
         }
 
         .route .origin {
@@ -94,11 +96,43 @@
         }
 
         .agency {
+            min-width: 140px;
             font-size: 14px;
+            font-weight: 800;
             line-height: 19px;
         }
 
+        .other-agency {
+            cursor: pointer;
+            display: block;
+            margin: 15px 0;
+            color: #1FAEFF;
+            text-decoration: none;
+        }
+
+        .other-agency:hover {
+            color: #1FAEFF;
+            text-decoration: underline;
+        }
+
+        .other-price {
+            font-size: 18px;
+            text-align: right;
+            cursor: pointer;
+            display: block;
+            margin: 15px 42px 15px 0;
+            color: #1FAEFF;
+            text-decoration: none;
+        }
+
+        .other-price:hover {
+            color: #1FAEFF;
+            text-decoration: none;
+        }
+
         .agency-more {
+            margin-top: 7px;
+            cursor: pointer;
             font-size: 12px;
             line-height: 16px;
             color: #779EB3;
@@ -250,14 +284,22 @@
     }
 
     handlePrice = ({script, price, id}) => {
+      this.get(id).prices[script] = price
+      this.save()
+    }
+
+    get = (id) => {
       let subscription
       for (let s of this.state.subscriptions) {
         if (s.id === id) {
           subscription = s
         }
       }
+      return subscription
+    }
 
-      console.log(subscription.id, script, price)
+    save = () => {
+      this.setState({subscriptions: [...this.state.subscriptions]})
     }
 
     componentDidMount() {
@@ -267,11 +309,19 @@
           s[name] = value
         }
 
-        s.id = this.state.subscriptions.length + 1
+        let max = 0
+        for (let s of this.state.subscriptions) {
+          if (s.id > max) {
+            max = s.id
+          }
+        }
+
+        s.id = max + 1
         s.active = true
         s.departDate = new Date(s.departDate)
         s.returnDate = new Date(s.returnDate)
         s.notify = true
+        s.prices = {}
 
         this.setState({subscriptions: [...this.state.subscriptions, s]})
 
@@ -285,13 +335,28 @@
   }
 
   class Subscription extends React.Component {
+    state = {
+      expanded: false
+    }
+
     render() {
       const {
         id,
         origin, destination, departDate, returnDate,
-        active, timeAgo, agency, price, notify,
+        active, timeAgo, prices, notify,
         onDelete, onActivate, onMute,
       } = this.props
+
+      const {expanded} = this.state
+
+      let agency, price
+      for (let [a, p] of Object.entries(prices)) {
+        if (typeof price === 'undefined' || price > p) {
+          price = p
+          agency = a
+        }
+      }
+
       return (
         <tr className={classnames('flex-table row', {'inactive': !active})}>
           <td>
@@ -307,20 +372,38 @@
             </div>
           </td>
 
-          <td className="dates flex-row">
+          <td className="dates">
             <div>{getLongMonthName(departDate)} {departDate.getDate()}, {departDate.getFullYear()}</div>
             <div>{getLongMonthName(departDate)} {returnDate.getDate()}, {returnDate.getFullYear()}</div>
           </td>
 
-          <td className="price-found flex-row">
+          <td className="price-found">
             {timeAgo && <TimeAgo date={timeAgo.toUTCString()}/>}
           </td>
 
-          <td className="agency flex-row">
+          <td>
             <div className="agency">{agency}</div>
-            <div className="agency-more">
-              Check other deals <img src="icons/more.svg" alt=""/>
-            </div>
+            {expanded
+              ?
+              <div className="agency-more" onClick={this.handleMore}>
+                Collapse <img src="icons/collapse.svg" alt=""/>
+              </div>
+              :
+              <div className="agency-more" onClick={this.handleMore}>
+                Check other deals <img src="icons/more.svg" alt=""/>
+              </div>
+            }
+
+            {expanded && (
+              Object.entries(prices).map(([a]) => {
+                if (a === agency) {
+                  return null
+                }
+                return (
+                  <a key={a} className="other-agency">{a}</a>
+                )
+              })
+            )}
           </td>
 
           <td>
@@ -330,6 +413,17 @@
                 : <img src="icons/no-notify.svg" alt="" onClick={e => onMute(e, id)}/>}
               <div className="value">${price}</div>
             </div>
+
+            {expanded && (
+              Object.entries(prices).map(([a, price]) => {
+                if (a === agency) {
+                  return null
+                }
+                return (
+                  <a key={a} className="other-price">${price} <img src="icons/external.svg" alt=""/></a>
+                )
+              })
+            )}
           </td>
 
           <td>
@@ -340,6 +434,10 @@
           </td>
         </tr>
       )
+    }
+
+    handleMore = (event) => {
+      this.setState({expanded: !this.state.expanded})
     }
   }
 
