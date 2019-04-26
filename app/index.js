@@ -1,4 +1,4 @@
-const electron = require('electron');
+const electron = require('electron/electron');
 const {ipcRenderer} = electron;
 const ul = document.querySelector('ul');
 

@@ -1,4 +1,4 @@
-const {ipcRenderer} = require('electron')
+const {ipcRenderer} = require('electron/electron')
 const $ = require('jquery')
 
 const form = document.querySelector('form')
