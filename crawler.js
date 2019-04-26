@@ -5,16 +5,16 @@ const scripts = [
   'southwest',
   'skyscanner',
   'delta',
-    'aviasales',
-    'kayak',
-    'airasia'
+  'aviasales',
+  'kayak',
+  'airasia'
 ]
 exports.scripts = scripts
 
 exports.crawlAll = function crawlAll(subscription, onPrice, options = {}) {
-    for (let script of scripts) {
-      crawl(subscription, script, onPrice, options)
-    }
+  for (let script of scripts) {
+    crawl(subscription, script, onPrice, options)
+  }
 }
 
 exports.crawl = async function crawl(subscription, script, onPrice, options = {}) {
