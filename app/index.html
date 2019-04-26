@@ -36,22 +36,12 @@
             color: white;
             padding: 0.5em;
             text-align: left;
+            text-transform: uppercase;
+            font-size: 12px;
         }
 
         th:nth-child(2) {
             text-align: center;
-        }
-
-        @media only screen and (max-width: 767px) {
-            th, td {
-                width: auto;
-                display: block;
-                border: 0;
-            }
-
-            .flex-row {
-                width: 100%;
-            }
         }
 
         .header {
@@ -59,12 +49,6 @@
             background: #355A6F;
             text-transform: uppercase;
 
-        }
-
-        th {
-            text-transform: uppercase;
-            color: white;
-            font-size: 12px;
         }
 
         .row.inactive {
@@ -177,29 +161,29 @@
 <div id="root"></div>
 
 <script type="text/babel">
-  //require('../crawler.js')
-  require('./addSubscription.js')
-  const {ipcRenderer} = require('electron')
+  const {crawlAll} = require('../crawler.js')
+  const {createAddWindow} = require('./addSubscription.js')
+  const {ipcRenderer, remote} = require('electron')
   const classnames = require('classnames')
   const {default: TimeAgo} = require('react-timeago')
+  const fs = require('fs')
+  const path = require('path')
 
-  const subscriptions = [{
-    id: 0,
-    active: true,
-    origin: 'NYC',
-    destination: 'LAX',
-    departDate: new Date('2019-05-13'),
-    returnDate: new Date('2019-05-17'),
-    mute: true,
-    timeAgo: undefined,
-  }]
+  const {app} = remote
+  const userDataPath = app.getPath('userData')
+  const dataPath = path.join(userDataPath, 'subscriptions.json')
+
+  const initialState = JSON.parse(fs.readFileSync(dataPath).toString('utf8'))
+  for (let s of initialState.subscriptions) {
+    if (s.departDate) s.departDate = new Date(s.departDate)
+    if (s.returnDate) s.returnDate = new Date(s.returnDate)
+    if (s.timeAgo) s.timeAgo = new Date(s.timeAgo)
+  }
 
   class App extends React.Component {
     constructor(props) {
       super(props)
-      this.state = {
-        subscriptions: subscriptions,
-      }
+      this.state = initialState
     }
 
     render() {
@@ -208,14 +192,14 @@
         <div>
           <table className="table-container">
             <thead>
-            <tr className="flex-table header">
-              <th className="flex-row">&nbsp;</th>
-              <th className="flex-row">Route</th>
-              <th className="flex-row">Date</th>
-              <th className="flex-row">Price found</th>
-              <th className="flex-row">Agency</th>
-              <th className="flex-row">Best price</th>
-              <th className="flex-row">&nbsp;</th>
+            <tr className="header">
+              <th>&nbsp;</th>
+              <th>Route</th>
+              <th>Date</th>
+              <th>Price found</th>
+              <th>Agency</th>
+              <th>Best price</th>
+              <th>&nbsp;</th>
             </tr>
             </thead>
             <tbody>
@@ -233,7 +217,7 @@
     }
 
     handleAdd = () => {
-      window.createAddWindow()
+      createAddWindow()
     }
 
     handleDelete = (event, id) => {
@@ -244,6 +228,9 @@
       for (let s of this.state.subscriptions) {
         if (s.id === id) {
           s.active = !s.active
+          if (s.active) {
+            crawlAll(s, this.handlePrice)
+          }
         }
       }
       this.setState({subscriptions: [...this.state.subscriptions]})
@@ -258,6 +245,21 @@
       this.setState({subscriptions: [...this.state.subscriptions]})
     }
 
+    handleCreated = (subscription) => {
+      crawlAll(subscription, this.handlePrice)
+    }
+
+    handlePrice = ({script, price, id}) => {
+      let subscription
+      for (let s of this.state.subscriptions) {
+        if (s.id === id) {
+          subscription = s
+        }
+      }
+
+      console.log(subscription.id, script, price)
+    }
+
     componentDidMount() {
       ipcRenderer.on('add_subscription', (event, form) => {
         const s = {}
@@ -269,9 +271,16 @@
         s.active = true
         s.departDate = new Date(s.departDate)
         s.returnDate = new Date(s.returnDate)
+        s.notify = true
 
         this.setState({subscriptions: [...this.state.subscriptions, s]})
+
+        this.handleCreated(s)
       })
+
+      setInterval(() => {
+        fs.writeFileSync(dataPath, JSON.stringify(this.state, null, 2))
+      }, 2000)
     }
   }
 
@@ -285,12 +294,12 @@
       } = this.props
       return (
         <tr className={classnames('flex-table row', {'inactive': !active})}>
-          <td className="flex-row">
-            {active
+          <td>
+            {!active
               ? <img src="icons/play.svg" alt="" className="play-pause" onClick={e => onActivate(e, id)}/>
               : <img src="icons/pause.svg" alt="" className="play-pause" onClick={e => onActivate(e, id)}/>}
           </td>
-          <td className="flex-row">
+          <td>
             <div className="route">
               <div className="origin">{origin.toUpperCase()}</div>
               <img src="./icons/planes.svg" alt=""/>
@@ -314,7 +323,7 @@
             </div>
           </td>
 
-          <td className="flex-row">
+          <td>
             <div className="best-price">
               {notify
                 ? <img src="icons/notify.svg" alt="" onClick={e => onMute(e, id)}/>
@@ -323,7 +332,7 @@
             </div>
           </td>
 
-          <td className="flex-row">
+          <td>
             <div className="controls">
               <div className="btn">View details</div>
               <img src="icons/delete.svg" alt="" onClick={e => onDelete(e, id)}/>

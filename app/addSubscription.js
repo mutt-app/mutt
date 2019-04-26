@@ -6,7 +6,7 @@ const path = require('path')
 let addWindow
 
 // Handle create add window
-function createAddWindow(){
+exports.createAddWindow = function createAddWindow(){
   // Create the add window.
   addWindow = new BrowserWindow({
     width: 434,
@@ -31,5 +31,3 @@ function createAddWindow(){
     addWindow = null
   })
 }
-window.createAddWindow = createAddWindow
-

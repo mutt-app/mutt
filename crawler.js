@@ -6,24 +6,23 @@ const scripts = [
   'skyscanner',
   'delta',
 ]
-const subscriptions = [{
-  origin: 'NYC',
-  destination: 'LAX',
-  departDate: new Date('2019-05-13'),
-  returnDate: new Date('2019-05-17'),
-}]
 
-void async function main() {
-  for (let subscription of subscriptions) {
+exports.crawlAll = function crawlAll(subscription, onPrice, options = {}) {
     for (let script of scripts) {
-      crawl(subscription, script)
+      crawl(subscription, script, onPrice, options)
     }
-  }
-}()
+}
 
-async function crawl(subscription, script) {
-  const browser = await createBrowser({
+async function crawl(subscription, script, onPrice, options = {}) {
+  console.log(`Starting crawling ${script} for subscription #${subscription.id} (${subscription.origin}→${subscription.destination}).`)
+
+  options = {
     headless: true,
+    ...options
+  }
+
+  const browser = await createBrowser({
+    headless: options.headless,
     slowMo: 33
   })
 
@@ -36,13 +35,14 @@ async function crawl(subscription, script) {
     const fn = require('./scripts/' + script)
     price = await fn({browser, page, ...subscription})
   } catch (e) {
-    page.screenshot({path: `./${script}.png`})
+    console.error(`Error in ${script}!`)
     throw e
   } finally {
     browser.close()
   }
 
-  console.log(script, price)
+  console.log(`Price from ${script} (${subscription.origin}→${subscription.destination}): $${price}`)
+  onPrice({script, price, id: subscription.id})
 }
 
 function createBrowser(options = {}) {
