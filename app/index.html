@@ -190,7 +190,8 @@
     destination: 'LAX',
     departDate: new Date('2019-05-13'),
     returnDate: new Date('2019-05-17'),
-    timeAgo: new Date(),
+    mute: true,
+    timeAgo: undefined,
   }]
 
   class App extends React.Component {
@@ -221,6 +222,7 @@
             {subscriptions.map(s => <Subscription key={s.id} {...s}
                                                   onDelete={this.handleDelete}
                                                   onActivate={this.handleActivate}
+                                                  onMute={this.handleNotify}
             />)}
             </tbody>
           </table>
@@ -242,6 +244,15 @@
       for (let s of this.state.subscriptions) {
         if (s.id === id) {
           s.active = !s.active
+        }
+      }
+      this.setState({subscriptions: [...this.state.subscriptions]})
+    }
+
+    handleNotify = (event, id) => {
+      for (let s of this.state.subscriptions) {
+        if (s.id === id) {
+          s.notify = !s.notify
         }
       }
       this.setState({subscriptions: [...this.state.subscriptions]})
@@ -269,8 +280,8 @@
       const {
         id,
         origin, destination, departDate, returnDate,
-        active, timeAgo, agency, price,
-        onDelete, onActivate,
+        active, timeAgo, agency, price, notify,
+        onDelete, onActivate, onMute,
       } = this.props
       return (
         <tr className={classnames('flex-table row', {'inactive': !active})}>
@@ -305,7 +316,9 @@
 
           <td className="flex-row">
             <div className="best-price">
-              <img src="icons/notify.svg" alt=""/>
+              {notify
+                ? <img src="icons/notify.svg" alt="" onClick={e => onMute(e, id)}/>
+                : <img src="icons/no-notify.svg" alt="" onClick={e => onMute(e, id)}/>}
               <div className="value">${price}</div>
             </div>
           </td>
