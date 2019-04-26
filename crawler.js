@@ -23,7 +23,7 @@ void async function main() {
 
 async function crawl(subscription, script) {
   const browser = await createBrowser({
-    headless: false,
+    headless: true,
     slowMo: 33
   })
 
@@ -36,6 +36,7 @@ async function crawl(subscription, script) {
     const fn = require('./scripts/' + script)
     price = await fn({browser, page, ...subscription})
   } catch (e) {
+    page.screenshot({path: `./${script}.png`})
     throw e
   } finally {
     browser.close()
@@ -48,9 +49,9 @@ function createBrowser(options = {}) {
   return puppeteer.launch({
     ...options,
     executablePath: getChromiumExecPath()
-  });
+  })
 }
 
 function getChromiumExecPath() {
-  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked');
+  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked')
 }
