@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add subscription</title>
+</head>
+<body>
+<form>
+    <div>
+        <label>Origin</label>
+        <input type="text" name="origin" id="origin">
+    </div>
+    <div>
+        <label>Destination</label>
+        <input type="text" name="destination" id="destination">
+    </div>
+    <div>
+        <label>Depart date</label>
+        <input type="date" name="depart_date" id="depart_date">
+    </div>
+    <div>
+        <label>Return date</label>
+        <input type="date" name="return_date" id="return_date">
+    </div>
+    <button type="submit" id="add_subscription">Add subscription</button>
+</form>
+<script>
+  require('./js/addSubscription.js')
+  require('./js/subscriptionForm.js')
+</script>
+</body>
+</html>
