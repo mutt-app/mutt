@@ -1,6 +1,7 @@
 const {delay, parsePrice} = require('.')
 
 module.exports = async ({page, origin, destination, departDate, returnDate}) => {
+  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36')
   await page.goto('https://www.delta.com/')
 
   // Typing origin

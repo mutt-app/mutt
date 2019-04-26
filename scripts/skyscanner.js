@@ -3,6 +3,7 @@ const {delay, parsePrice} = require('.')
 module.exports = async ({page, origin, destination, departDate, returnDate}) => {
   const departDateString = toISOString(departDate)
   const returnDateString = toISOString(returnDate)
+  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36')
 
   // Going to scyscanner
   await page.goto('https://skyscanner.com?currency=USD&market=US&locale=en-US')
