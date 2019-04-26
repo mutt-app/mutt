@@ -208,11 +208,19 @@
   const userDataPath = app.getPath('userData')
   const dataPath = path.join(userDataPath, 'subscriptions.json')
 
-  const initialState = JSON.parse(fs.readFileSync(dataPath).toString('utf8'))
-  for (let s of initialState.subscriptions) {
-    if (s.departDate) s.departDate = new Date(s.departDate)
-    if (s.returnDate) s.returnDate = new Date(s.returnDate)
-    if (s.timeAgo) s.timeAgo = new Date(s.timeAgo)
+  let initialState = {
+    subscriptions: [],
+  }
+
+  try {
+    initialState = JSON.parse(fs.readFileSync(dataPath).toString('utf8'))
+    for (let s of initialState.subscriptions) {
+      if (s.departDate) s.departDate = new Date(s.departDate)
+      if (s.returnDate) s.returnDate = new Date(s.returnDate)
+      if (s.timeAgo) s.timeAgo = new Date(s.timeAgo)
+    }
+  } catch (e) {
+    // pass
   }
 
   class App extends React.Component {
