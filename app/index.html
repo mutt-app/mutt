@@ -151,6 +151,13 @@
             letter-spacing: 0.1em;
             text-transform: uppercase;
         }
+
+        .add-subscription {
+            position: fixed;
+            bottom: 0;
+            cursor: pointer;
+            left: calc(50% - 33px);
+        }
     </style>
 </head>
 <body>
@@ -180,22 +187,30 @@
     render() {
       const {subscriptions} = this.state
       return (
-        <table className="table-container">
-          <thead>
-          <tr className="flex-table header">
-            <th className="flex-row">Route</th>
-            <th className="flex-row">Date</th>
-            <th className="flex-row">Price found</th>
-            <th className="flex-row">Agency</th>
-            <th className="flex-row">Best price</th>
-            <th className="flex-row">&nbsp;</th>
-          </tr>
-          </thead>
-          <tbody>
-          {subscriptions.map(s => <Subscription key={s.id} {...s}/>)}
-          </tbody>
-        </table>
+        <div>
+          <table className="table-container">
+            <thead>
+            <tr className="flex-table header">
+              <th className="flex-row">Route</th>
+              <th className="flex-row">Date</th>
+              <th className="flex-row">Price found</th>
+              <th className="flex-row">Agency</th>
+              <th className="flex-row">Best price</th>
+              <th className="flex-row">&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            {subscriptions.map(s => <Subscription key={s.id} {...s}/>)}
+            </tbody>
+          </table>
+
+          <img className="add-subscription" src="icons/Add.svg" alt="" onClick={this.handleAdd}/>
+        </div>
       )
+    }
+
+    handleAdd = () => {
+      window.createAddWindow()
     }
   }
 
@@ -214,8 +229,8 @@
           </td>
 
           <td className="dates flex-row">
-            <div>{getLongMonthName(departDate)} {departDate.getDate()}</div>
-            <div>{getLongMonthName(departDate)} {returnDate.getDate()}</div>
+            <div>{getLongMonthName(departDate)} {departDate.getDate()}, {departDate.getFullYear()}</div>
+            <div>{getLongMonthName(departDate)} {returnDate.getDate()}, {returnDate.getFullYear()}</div>
           </td>
 
           <td className="price-found flex-row">
