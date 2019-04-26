@@ -5,21 +5,20 @@ const path = require('path')
 
 let addWindow
 
-
 // Handle create add window
 function createAddWindow(){
   // Create the add window.
   addWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    title: 'Add new travel subscription',
+    width: 434,
+    height: 211,
+    title: 'Add new subscription',
     webPreferences: {
       nodeIntegration: true
     }
   })
   // and load the index.html of the app.
   addWindow.loadURL(url.format({
-    pathname: path.join(__dirname, '../addSubscription.html'),
+    pathname: path.join(__dirname, './addSubscription.html'),
     protocol: 'file:',
     slashes: true
   }))

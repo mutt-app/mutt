@@ -38,7 +38,7 @@
             text-align: left;
         }
 
-        th:first-child {
+        th:nth-child(2) {
             text-align: center;
         }
 
@@ -68,7 +68,7 @@
         }
 
         .play-pause {
-            margin: 22px;
+            margin-left: 15px;
         }
 
         .route {
@@ -191,6 +191,7 @@
           <table className="table-container">
             <thead>
             <tr className="flex-table header">
+              <th className="flex-row">&nbsp;</th>
               <th className="flex-row">Route</th>
               <th className="flex-row">Date</th>
               <th className="flex-row">Price found</th>
@@ -204,7 +205,7 @@
             </tbody>
           </table>
 
-          <img className="add-subscription" src="icons/Add.svg" alt="" onClick={this.handleAdd}/>
+          <img className="add-subscription" src="icons/add.svg" alt="" onClick={this.handleAdd}/>
         </div>
       )
     }
@@ -220,8 +221,10 @@
       return (
         <tr className="flex-table row">
           <td className="flex-row">
+            <img src="icons/play.svg" alt="" className="play-pause"/>
+          </td>
+          <td className="flex-row">
             <div className="route">
-              <img src="icons/play.svg" alt="" className="play-pause"/>
               <div className="origin">{origin}</div>
               <img src="./icons/planes.svg" alt=""/>
               <div className="destination">{destination}</div>

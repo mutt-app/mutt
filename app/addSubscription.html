@@ -3,27 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <title>Add subscription</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <style>
+        html {
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 14px;
+            color: #122129;
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            min-width: 100vw;
+        }
+
+        button {
+            display: block;
+            position: fixed;
+            height: 40px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #FFC045;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            transition: background 250ms ease-in-out, transform 150ms ease;
+            width: 100%;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 16px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #122129;
+        }
+
+        input {
+            display: inline-block;
+            width: 180px;
+            height: 40px;
+            background: #FFFFFF;
+            border: 1px solid #D7DDE9;
+            box-sizing: border-box;
+            margin: 10px;
+            padding-left: 10px;
+
+            font-style: normal;
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 16px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #4D595F;
+        }
+
+        input:placeholder-shown {
+            background: #F7F9FA;
+        }
+
+        input::placeholder {
+            font-style: normal;
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 16px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #4D595F;
+            opacity: 0.4;
+        }
+
+        form {
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
 <form>
-    <div>
-        <label>Origin</label>
-        <input type="text" name="origin" id="origin">
-    </div>
-    <div>
-        <label>Destination</label>
-        <input type="text" name="destination" id="destination">
-    </div>
-    <div>
-        <label>Depart date</label>
-        <input type="date" name="depart_date" id="depart_date">
-    </div>
-    <div>
-        <label>Return date</label>
-        <input type="date" name="return_date" id="return_date">
-    </div>
+    <input type="text" name="origin" id="origin" placeholder="origin">
+    <input type="text" name="destination" id="destination" placeholder="destination">
+    <input type="date" name="depart_date" id="depart_date" placeholder="depart_date">
+    <input type="date" name="return_date" id="return_date" placeholder="return_date">
     <button type="submit" id="add_subscription">Add subscription</button>
 </form>
+
+<div id="root"></div>
+
 <script>
   require('./addSubscription.js')
   require('./subscriptionForm.js')
