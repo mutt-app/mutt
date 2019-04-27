@@ -334,7 +334,7 @@
       for (let script of scripts) {
         menu.append(new MenuItem({
           label: `Inspect ${script}`,
-          click: () => crawl(this.props, script, this.props.onPrice, {headless: false, close: false, goto: true}),
+          click: () => crawl(this.props, script, this.props.onPrice, {headless: false, close: false}),
         }))
       }
 
