@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Add subscription</title>
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&amp;subset=cyrillic" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&amp;subset=cyrillic"
+          rel="stylesheet">
     <style>
         html {
             box-sizing: border-box;
@@ -48,13 +49,11 @@
         }
 
         input {
-            display: inline-block;
             width: 180px;
             height: 40px;
             background: #FFFFFF;
             border: 1px solid #D7DDE9;
             box-sizing: border-box;
-            margin: 10px;
             padding-left: 10px;
 
             font-style: normal;
@@ -84,14 +83,41 @@
         form {
             padding: 10px;
         }
+
+        .rel {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .cal {
+            display: block;
+            position: absolute;
+            content: '';
+            width: 13px;
+            height: 14px;
+            top: 13px;
+            right: 13px;
+            background: url("icons/calendar.svg") no-repeat;
+        }
     </style>
 </head>
 <body>
 <form>
-    <input type="text" name="origin" id="origin:" placeholder="origin">
-    <input type="text" name="destination" id="destination:" placeholder="destination">
-    <input type="date" name="departDate" id="departDate:" placeholder="depart date">
-    <input type="date" name="returnDate" id="returnDate:" placeholder="return date">
+    <div class="rel">
+        <input type="text" name="origin" id="origin" placeholder="origin">
+    </div>
+    <div class="rel">
+        <input type="text" name="destination" id="destination" placeholder="destination">
+    </div>
+    <div class="rel">
+        <input type="text" name="departDate" id="departDate" placeholder="depart date">
+        <div class="cal"></div>
+    </div>
+    <div class="rel">
+        <input type="text" name="returnDate" id="returnDate" placeholder="return date">
+        <div class="cal"></div>
+    </div>
     <button type="submit" id="add_subscription">Add subscription</button>
 </form>
 

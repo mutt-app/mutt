@@ -110,12 +110,7 @@
       if (s) {
         s.active = !s.active
         if (s.active) {
-          crawlAll(s, this.handlePrice)
-
-          this.setState({processing: {...this.state.processing, [id]: true}})
-          setTimeout(() => {
-            this.setState({processing: {...this.state.processing, [id]: false}})
-          }, 40000)
+          this.handleCreated(s)
         } else {
           this.setState({processing: {...this.state.processing, [id]: false}})
         }
@@ -134,6 +129,11 @@
 
     handleCreated = (subscription) => {
       crawlAll(subscription, this.handlePrice)
+
+      this.setState({processing: {...this.state.processing, [id]: true}})
+      setTimeout(() => {
+        this.setState({processing: {...this.state.processing, [id]: false}})
+      }, 40000)
     }
 
     handlePrice = ({script, price, id}) => {
@@ -186,10 +186,22 @@
           }
         }
 
+        const now = new Date()
+        function getMonth(date) {
+          const [m,_] = date.split('/')
+          return m-1
+        }
+        function getDate(date) {
+          const [,d] = date.split('/')
+          return d
+        }
+
         s.id = max + 1
+
         s.active = true
-        s.departDate = new Date(s.departDate)
-        s.returnDate = new Date(s.returnDate)
+
+        s.departDate = new Date(now.getFullYear(), getMonth(s.departDate), getDate(s.departDate))
+        s.returnDate = new Date(now.getFullYear(), getMonth(s.returnDate), getDate(s.returnDate))
         s.notify = true
         s.prices = {}
         s.prevPrices = {}
