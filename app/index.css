@@ -19,11 +19,6 @@ html {
     margin-bottom: 70px;
 }
 
-td {
-    vertical-align: top;
-    padding: 20px 0;
-}
-
 th {
     color: white;
     padding: 0.5em;
@@ -39,8 +34,9 @@ th {
 
 }
 
-.row {
-    border-bottom: 2px solid #E7EDF0;
+.row > td {
+    vertical-align: top;
+    padding: 20px 0 15px;
 }
 
 .row.inactive {
@@ -49,6 +45,28 @@ th {
 
 .row.inactive img {
     opacity: 0.5;
+}
+
+.progressbar-row {
+    height: 5px;
+    border-bottom: 2px solid #E7EDF0;
+}
+
+.progressbar {
+    background: #1FAEFF;
+    height: 5px;
+    animation: progress 40s ease-in-out;
+    animation-iteration-count: 1;
+}
+
+@keyframes progress {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
 }
 
 .play-pause {

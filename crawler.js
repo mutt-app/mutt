@@ -14,7 +14,7 @@ exports.scripts = scripts
 exports.crawlAll = function crawlAll(subscription, onPrice, options = {}) {
   let i = 0
   for (let script of scripts) {
-    setTimeout(() => crawl(subscription, script, onPrice, options), 100 * i)
+    setTimeout(() => crawl(subscription, script, onPrice, options),  i * 1000)
     i++
   }
 }

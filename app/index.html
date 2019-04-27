@@ -29,6 +29,7 @@
 
   let initialState = {
     subscriptions: [],
+    processing: {},
   }
 
   try {
@@ -42,6 +43,8 @@
     // pass
   }
 
+  initialState.processing = {} // No progressbar of start.
+
   class App extends React.Component {
     constructor(props) {
       super(props)
@@ -49,7 +52,7 @@
     }
 
     render() {
-      const {subscriptions} = this.state
+      const {subscriptions, processing} = this.state
       return (
         <div>
           <table className="table-container">
@@ -66,6 +69,7 @@
             </thead>
             <tbody>
             {subscriptions.map(s => <Subscription key={s.id} {...s}
+                                                  processing={processing[s.id]}
                                                   onDelete={this.handleDelete}
                                                   onActivate={this.handleActivate}
                                                   onMute={this.handleNotify}
@@ -88,15 +92,20 @@
     }
 
     handleActivate = (event, id) => {
-      for (let s of this.state.subscriptions) {
-        if (s.id === id) {
-          s.active = !s.active
-          if (s.active) {
-            crawlAll(s, this.handlePrice)
-          }
+      const s = this.get(id)
+      if (s) {
+        s.active = !s.active
+        if (s.active) {
+          crawlAll(s, this.handlePrice)
+          this.setState({processing: {...this.state.processing, [id]: true}})
+          setTimeout(() => {
+            this.setState({processing: {...this.state.processing, [id]: false}})
+          }, 40000)
+        } else {
+          this.setState({processing: {...this.state.processing, [id]: false}})
         }
+        this.save()
       }
-      this.setState({subscriptions: [...this.state.subscriptions]})
     }
 
     handleNotify = (event, id) => {
@@ -176,8 +185,8 @@
       const {
         id,
         origin, destination, departDate, returnDate,
-        active, timeAgo, prices, notify,
-        onDelete, onActivate, onMute, onPrice,
+        active, timeAgo, prices, notify, processing,
+        onDelete, onActivate, onMute,
       } = this.props
 
       const {expanded} = this.state
@@ -194,77 +203,85 @@
       }
 
       return (
-        <tr className={classnames('flex-table row', {'inactive': !active})} onContextMenu={this.handleMenu}>
-          <td>
-            {!active
-              ? <img src="icons/play.svg" alt="" className="play-pause" onClick={e => onActivate(e, id)}/>
-              : <img src="icons/pause.svg" alt="" className="play-pause" onClick={e => onActivate(e, id)}/>}
-          </td>
-          <td>
-            <div className="route">
-              <div className="origin">{origin.toUpperCase()}</div>
-              <img src="./icons/planes.svg" alt=""/>
-              <div className="destination">{destination.toUpperCase()}</div>
-            </div>
-          </td>
-
-          <td className="dates">
-            <div>{getLongMonthName(departDate)} {departDate.getDate()}, {departDate.getFullYear()}</div>
-            <div>{getLongMonthName(departDate)} {returnDate.getDate()}, {returnDate.getFullYear()}</div>
-          </td>
-
-          <td className="price-found">
-            {timeAgo && <TimeAgo date={timeAgo.toUTCString()}/>}
-          </td>
-
-          <td>
-            <div className="agency">{agency}</div>
-            {expanded
-              ?
-              <div className="agency-more" onClick={this.handleMore}>
-                Collapse <img src="icons/collapse.svg" alt=""/>
+        <React.Fragment>
+          <tr className={classnames('row', {'inactive': !active})} onContextMenu={this.handleMenu}>
+            <td>
+              {!active
+                ? <img src="icons/play.svg" alt="" className="play-pause" onClick={e => onActivate(e, id)}/>
+                : <img src="icons/pause.svg" alt="" className="play-pause" onClick={e => onActivate(e, id)}/>}
+            </td>
+            <td>
+              <div className="route">
+                <div className="origin">{origin.toUpperCase()}</div>
+                <img src="./icons/planes.svg" alt=""/>
+                <div className="destination">{destination.toUpperCase()}</div>
               </div>
-              :
-              <div className="agency-more" onClick={this.handleMore}>
-                Check other deals <img src="icons/more.svg" alt=""/>
+            </td>
+
+            <td className="dates">
+              <div>{getLongMonthName(departDate)} {departDate.getDate()}, {departDate.getFullYear()}</div>
+              <div>{getLongMonthName(departDate)} {returnDate.getDate()}, {returnDate.getFullYear()}</div>
+            </td>
+
+            <td className="price-found">
+              {timeAgo && <TimeAgo date={timeAgo.toUTCString()}/>}
+            </td>
+
+            <td>
+              <div className="agency">{agency}</div>
+              {expanded
+                ?
+                <div className="agency-more" onClick={this.handleMore}>
+                  Collapse <img src="icons/collapse.svg" alt=""/>
+                </div>
+                :
+                <div className="agency-more" onClick={this.handleMore}>
+                  Check other deals <img src="icons/more.svg" alt=""/>
+                </div>
+              }
+
+              {expanded && (
+                <div className="others">
+                  {_.sortBy(Object.entries(prices), 1).map(([a, p]) => {
+                    if (a === agency) {
+                      return null
+                    }
+                    return (
+                      <div>
+                        <a key={a} className="other-agency">{a}</a>
+                        {p
+                          ? <a key={a} className="other-price">${p} <img src="icons/external.svg" alt=""/></a>
+                          : <img className="other-price-error" src="icons/error.svg" alt=""/>}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </td>
+
+            <td>
+              <div className="best-price">
+                {notify
+                  ? <img src="icons/notify.svg" alt="" onClick={e => onMute(e, id)}/>
+                  : <img src="icons/no-notify.svg" alt="" onClick={e => onMute(e, id)}/>}
+                <div className="value">${price}</div>
               </div>
-            }
+            </td>
 
-            {expanded && (
-              <div className="others">
-                {_.sortBy(Object.entries(prices), 1).map(([a, p]) => {
-                  if (a === agency) {
-                    return null
-                  }
-                  return (
-                    <div>
-                      <a key={a} className="other-agency">{a}</a>
-                      {p
-                        ? <a key={a} className="other-price">${p} <img src="icons/external.svg" alt=""/></a>
-                        : <img className="other-price-error" src="icons/error.svg" alt=""/>}
-                    </div>
-                  )
-                })}
+            <td>
+              <div className="controls">
+                <div className="btn">View details</div>
+                <img src="icons/delete.svg" alt="" onClick={e => onDelete(e, id)}/>
               </div>
-            )}
-          </td>
+            </td>
+          </tr>
 
-          <td>
-            <div className="best-price">
-              {notify
-                ? <img src="icons/notify.svg" alt="" onClick={e => onMute(e, id)}/>
-                : <img src="icons/no-notify.svg" alt="" onClick={e => onMute(e, id)}/>}
-              <div className="value">${price}</div>
-            </div>
-          </td>
-
-          <td>
-            <div className="controls">
-              <div className="btn">View details</div>
-              <img src="icons/delete.svg" alt="" onClick={e => onDelete(e, id)}/>
-            </div>
-          </td>
-        </tr>
+          <tr className="progressbar-row">
+            <td className="progressbar-cell" colSpan="7">
+              {processing && <div className="progressbar"/>}
+            </td>
+          </tr>
+        </React.Fragment>
       )
     }
 
