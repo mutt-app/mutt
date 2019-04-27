@@ -13,6 +13,38 @@ html {
     padding: 0;
 }
 
+.welcome {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+.welcome-hero {
+    background: url("icons/welcome.svg") no-repeat;
+    width: 167px;
+    height: 240px;
+    margin: 0 auto -40px;
+}
+
+.welcome > h1 {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 38px;
+    line-height: 52px;
+}
+
+.welcome-description {
+    margin-top: 12px;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 25px;
+    /* identical to box height */
+    text-align: center;
+}
+
 .table-container {
     width: 100%;
     border-collapse: collapse;

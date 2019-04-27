@@ -53,6 +53,19 @@
 
     render() {
       const {subscriptions, processing} = this.state
+
+      if (subscriptions.length === 0) {
+        return (
+          <div className="welcome">
+              <div className="welcome-hero"/>
+              <h1>Welcome to Mutt!</h1>
+              <div className="welcome-description">
+                Create your first subscription and get the cheapest deal:
+              </div>
+          </div>
+        )
+      }
+
       return (
         <div>
           <table className="table-container">
