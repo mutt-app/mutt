@@ -97,6 +97,7 @@
         s.active = !s.active
         if (s.active) {
           crawlAll(s, this.handlePrice)
+
           this.setState({processing: {...this.state.processing, [id]: true}})
           setTimeout(() => {
             this.setState({processing: {...this.state.processing, [id]: false}})
@@ -164,6 +165,7 @@
         s.returnDate = new Date(s.returnDate)
         s.notify = true
         s.prices = {}
+        s.prevPrices = {}
 
         this.setState({subscriptions: [...this.state.subscriptions, s]})
 
@@ -185,14 +187,20 @@
       const {
         id,
         origin, destination, departDate, returnDate,
-        active, timeAgo, prices, notify, processing,
+        active, timeAgo, prices, prevPrices, notify, processing,
         onDelete, onActivate, onMute,
       } = this.props
 
-      const {expanded} = this.state
+      const {
+        expanded
+      } = this.state
+
+      const pricesArray = prices ? Object.entries(prices) : []
+      const prevPricesArray = prevPrices ? Object.entries(prevPrices) : []
+      const newPrices = pricesArray.length > 0 ? pricesArray : prevPricesArray
 
       let agency, price
-      for (let [a, p] of Object.entries(prices)) {
+      for (let [a, p] of newPrices) {
         if (!p) {
           continue
         }
@@ -242,13 +250,13 @@
 
               {expanded && (
                 <div className="others">
-                  {_.sortBy(Object.entries(prices), 1).map(([a, p]) => {
+                  {_.sortBy(newPrices, 1).map(([a, p]) => {
                     if (a === agency) {
                       return null
                     }
                     return (
-                      <div>
-                        <a key={a} className="other-agency">{a}</a>
+                      <div key={a}>
+                        <a className="other-agency">{a}</a>
                         {p
                           ? <a key={a} className="other-price">${p} <img src="icons/external.svg" alt=""/></a>
                           : <img className="other-price-error" src="icons/error.svg" alt=""/>}
