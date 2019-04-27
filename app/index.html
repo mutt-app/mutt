@@ -6,7 +6,8 @@
     <script src="https://unpkg.com/react@16.8/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16.8/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&amp;subset=cyrillic" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&amp;subset=cyrillic"
+          rel="stylesheet">
     <style>
         html {
             box-sizing: border-box;
@@ -306,9 +307,12 @@
     }
 
     handlePrice = ({script, price, id}) => {
-      this.get(id).timeAgo = new Date()
-      this.get(id).prices[script] = price
-      this.save()
+      const s = this.get(id)
+      if (s) {
+        s.timeAgo = new Date()
+        s.prices[script] = price
+        this.save()
+      }
     }
 
     get = (id) => {
@@ -374,6 +378,9 @@
 
       let agency, price
       for (let [a, p] of Object.entries(prices)) {
+        if (!p) {
+          continue
+        }
         if (typeof price === 'undefined' || price > p) {
           price = p
           agency = a
@@ -441,6 +448,11 @@
               Object.entries(prices).map(([a, price]) => {
                 if (a === agency) {
                   return null
+                }
+                if (!price) {
+                  return (
+                    <img src="icons/error.svg" alt=""/>
+                  )
                 }
                 return (
                   <a key={a} className="other-price">${price} <img src="icons/external.svg" alt=""/></a>

@@ -12,8 +12,10 @@ const scripts = [
 exports.scripts = scripts
 
 exports.crawlAll = function crawlAll(subscription, onPrice, options = {}) {
+  let i = 0
   for (let script of scripts) {
-    crawl(subscription, script, onPrice, options)
+    setTimeout(() => crawl(subscription, script, onPrice, options), 100 * i)
+    i++
   }
 }
 
@@ -34,22 +36,31 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
   const page = await browser.newPage()
   await page.setViewport({width: 1180, height: 1000})
 
-  let price = undefined
+  let price, err
 
   try {
     const fn = require('./scripts/' + script)
     price = await fn({browser, page, ...subscription})
   } catch (e) {
-    console.error(`Error in ${script}!`)
-    throw e
+    err = e
   } finally {
     if (options.close) {
       browser.close()
     }
   }
 
-  console.log(`Price from ${script} (${subscription.origin}→${subscription.destination}): $${price}`)
-  onPrice({script, price, id: subscription.id})
+  if (err) {
+    console.error(`Error in "${script}": ${err}`)
+    console.error(err.stack)
+  } else {
+    console.log(`Price from ${script} (${subscription.origin}→${subscription.destination}): $${price}`)
+  }
+
+  onPrice({
+    script,
+    price,
+    id: subscription.id
+  })
 }
 
 function createBrowser(options = {}) {
