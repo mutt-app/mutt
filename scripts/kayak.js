@@ -1,6 +1,6 @@
 const {delay, parsePrice} = require('.')
 
-module.exports = async ({page, origin, destination, departDate, returnDate}) => {
+module.exports = async ({page, origin, destination, departDate, returnDate, goto}) => {
   const departDateString = toISOString(departDate)
   const returnDateString = toISOString(returnDate)
 
@@ -61,6 +61,10 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
   const searchButton = await page.$('div[id$="col-button-wrapper"]')
   await delay(500)
   await searchButton.click()
+
+  if (goto) {
+    return
+  }
 
   await delay(35000)
   const prices = await page.$$('span[class^="price option-text"]')

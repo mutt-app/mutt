@@ -1,6 +1,6 @@
 const {delay, parsePrice} = require('.')
 
-module.exports = async ({page, origin, destination, departDate, returnDate}) => {
+module.exports = async ({page, origin, destination, departDate, returnDate, goto}) => {
   const departDateString = toISOString(departDate)
   const returnDateString = toISOString(returnDate)
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36')
@@ -30,6 +30,10 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
   // Choosing first segment
   // Opening calendar
   await page.evaluate((selector) => document.querySelector(selector).click(), '#depart-fsc-datepicker-button')
+  if (goto) {
+    return
+  }
+
   await page.waitForSelector('#depart-calendar__bpk_calendar_nav_select')
 
   // Cut first 0 from depart day
