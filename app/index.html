@@ -261,7 +261,7 @@
               <div>{getLongMonthName(departDate)} {returnDate.getDate()}, {returnDate.getFullYear()}</div>
             </td>
 
-            {!timeAgo && (
+            {timeAgo && (
               <React.Fragment>
                 <td className="price-found">
                   {timeAgo && <TimeAgo date={timeAgo.toUTCString()}/>}
@@ -318,7 +318,7 @@
               </React.Fragment>
             )}
 
-            {timeAgo && (
+            {!timeAgo && (
               <td colSpan="4">
                 <div className="paw-loader">
                   <div className="paw"><img src="icons/paw.svg" alt=""/></div>
