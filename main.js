@@ -7,6 +7,8 @@ const path = require('path')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
+app.isQuiting = false
+
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -28,19 +30,15 @@ function createWindow() {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 
-  mainWindow.on('minimize',function(event){
-    event.preventDefault();
-    mainWindow.hide();
-  });
-
-  mainWindow.on('close', function (event) {
+  // Continue to handle mainWindow "close" event here
+  mainWindow.on('close', function(e){
     if(!app.isQuiting){
-      event.preventDefault();
+      e.preventDefault()
       mainWindow.hide();
+    } else {
+      app.quit()
     }
-
-    return false;
-  });
+  })
 }
 
 ipcMain.on('add_subscription', function (e, item) {
@@ -53,7 +51,24 @@ ipcMain.on('add_subscription', function (e, item) {
 app.on('ready', () => {
   createWindow()
   createTray()
+
+  // You can use 'before-quit' instead of (or with) the close event
+  app.on('before-quit', function (e) {
+    // Handle menu-item or keyboard shortcut quit here
+    app.isQuiting = true
+  });
+
+  app.on('activate-with-no-open-windows', function(){
+    mainWindow.show();
+  });
 })
+
+// This is another place to handle events after all windows are closed
+app.on('will-quit', function () {
+  // This is a good place to add tests insuring the app is still
+  // responsive and all windows are closed.
+  mainWindow = null;
+});
 
 const createTray = () => {
   const trayIconPath = path.join(__dirname, 'app/icons/tray.png');
@@ -65,13 +80,13 @@ const createTray = () => {
         mainWindow.show();
       } },
     { label: 'Quit', click:  function(){
-        app.isQuiting = true;
-        app.quit();
-      } }
+        app.isQuiting = true
+        app.quit()
+      }
+    }
   ]);
   tray.setContextMenu(contextMenu)
 }
-
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -83,5 +98,9 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) createWindow()
+  if (mainWindow === null) {
+    createWindow()
+  }  else {
+    mainWindow.show()
+  }
 })
