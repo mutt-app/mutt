@@ -130,9 +130,9 @@
     handleCreated = (subscription) => {
       crawlAll(subscription, this.handlePrice)
 
-      this.setState({processing: {...this.state.processing, [id]: true}})
+      this.setState({processing: {...this.state.processing, [subscription.id]: true}})
       setTimeout(() => {
-        this.setState({processing: {...this.state.processing, [id]: false}})
+        this.setState({processing: {...this.state.processing, [subscription.id]: false}})
       }, 40000)
     }
 
