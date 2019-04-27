@@ -81,6 +81,7 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
 
     return
   }
+  // NOTE: Demo end
 
   const browser = await createBrowser({
     bin,
