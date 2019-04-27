@@ -45,6 +45,15 @@ html {
     text-align: center;
 }
 
+.welcome-add {
+    margin-top: 25px;
+    transition: transform 200ms;
+}
+
+.welcome-add:hover {
+    transform: scale(1.05);
+}
+
 .table-container {
     width: 100%;
     border-collapse: collapse;

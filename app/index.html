@@ -57,11 +57,12 @@
       if (subscriptions.length === 0) {
         return (
           <div className="welcome">
-              <div className="welcome-hero"/>
-              <h1>Welcome to Mutt!</h1>
-              <div className="welcome-description">
-                Create your first subscription and get the cheapest deal:
-              </div>
+            <div className="welcome-hero"/>
+            <h1>Welcome to Mutt!</h1>
+            <div className="welcome-description">
+              Create your first subscription and get the cheapest deal:
+            </div>
+            <img src="icons/create-subscription.svg" alt="" className="welcome-add" onClick={this.handleAdd}/>
           </div>
         )
       }
@@ -180,7 +181,10 @@
         s.prices = {}
         s.prevPrices = {}
 
-        this.setState({subscriptions: [...this.state.subscriptions, s]})
+        this.setState({
+          subscriptions: [...this.state.subscriptions, s],
+          processing: {...this.state.processing, [s.id]: true},
+        })
 
         this.handleCreated(s)
       })
