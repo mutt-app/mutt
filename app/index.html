@@ -72,13 +72,13 @@
           <table className="table-container">
             <thead>
             <tr className="header">
-              <th>&nbsp;</th>
+              <th width="60">&nbsp;</th>
               <th>Route</th>
               <th>Date</th>
               <th>Price found</th>
               <th>Agency</th>
               <th>Best price</th>
-              <th>&nbsp;</th>
+              <th width="200">&nbsp;</th>
             </tr>
             </thead>
             <tbody>
@@ -315,16 +315,16 @@
                 <td>
                   <div className="best-price">
                     {notify
-                      ? <img src="icons/notify.svg" alt="" onClick={e => onMute(e, id)}/>
-                      : <img src="icons/no-notify.svg" alt="" onClick={e => onMute(e, id)}/>}
+                      ? <img src="icons/notify.svg" alt="" className="nofity-btn" onClick={e => onMute(e, id)}/>
+                      : <img src="icons/no-notify.svg" alt="" className="nofity-btn" onClick={e => onMute(e, id)}/>}
                     <div className="value">${price}</div>
                   </div>
                 </td>
 
                 <td>
                   <div className="controls">
-                    <div className="btn" onClick={e => this.handleGoto(e, agency)}>View details</div>
-                    <img src="icons/delete.svg" alt="" onClick={e => onDelete(e, id)}/>
+                    <div className="btn" onClick={e => this.handleGoto(e, agency)}>View deal</div>
+                    <img src="icons/delete.svg" alt="" className="delete-btn" onClick={e => onDelete(e, id)}/>
                   </div>
                 </td>
               </React.Fragment>
