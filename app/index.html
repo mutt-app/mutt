@@ -144,7 +144,7 @@
         if (price) {
           const ps = _.sortBy(Object.entries(s.prices).filter(([a, p]) => p), 1)
           if (ps.length === 0 || price < ps[0][1]) {
-            const notification = new window.Notification(`Mutt!`, {
+            const notification = new window.Notification(`Mutt`, {
               body: `Found new price for ${s.origin.toUpperCase()}✈︎${s.destination.toUpperCase()} — $${price}`,
             })
             notification.onclick = () => {
