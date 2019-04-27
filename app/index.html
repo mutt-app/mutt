@@ -186,22 +186,12 @@
           }
         }
 
-        const now = new Date()
-        function getMonth(date) {
-          const [m,_] = date.split('/')
-          return m-1
-        }
-        function getDate(date) {
-          const [,d] = date.split('/')
-          return d
-        }
-
         s.id = max + 1
 
         s.active = true
 
-        s.departDate = new Date(now.getFullYear(), getMonth(s.departDate), getDate(s.departDate))
-        s.returnDate = new Date(now.getFullYear(), getMonth(s.returnDate), getDate(s.returnDate))
+        s.departDate = new Date(s.departDate)
+        s.returnDate = new Date(s.returnDate)
         s.notify = true
         s.prices = {}
         s.prevPrices = {}
