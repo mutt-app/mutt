@@ -28,6 +28,7 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
   options = {
     headless: true,
     close: true,
+    goto: false,
     ...options
   }
 
@@ -43,7 +44,7 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
 
   try {
     const fn = require('./scripts/' + script)
-    price = await fn({browser, page, ...subscription})
+    price = await fn({browser, page, ...subscription, goto: options.goto})
   } catch (e) {
     err = e
   } finally {
@@ -57,6 +58,10 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
     console.error(err.stack)
   } else {
     console.log(`Price from ${script} (${subscription.origin}→${subscription.destination}): $${price}`)
+  }
+
+  if (options.goto) {
+    return
   }
 
   onPrice({

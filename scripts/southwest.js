@@ -1,6 +1,6 @@
 const {delay} = require('.')
 
-module.exports = async ({page, origin, destination, departDate, returnDate}) => {
+module.exports = async ({page, origin, destination, departDate, returnDate, goto}) => {
   // TODO: choose 1 of the popular useragents
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36')
 
@@ -70,6 +70,9 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
   await delay(100)
   await page.evaluate((selector) => document.querySelector(selector).click(), '#LandingPageAirSearchForm_submit-button')
 
+  if (goto) {
+    return
+  }
 
   await page.waitForSelector('.filters--filter-area')
 
