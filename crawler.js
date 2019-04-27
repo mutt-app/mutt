@@ -3,12 +3,12 @@ const puppeteer = require('puppeteer-extra')
 puppeteer.use(require('puppeteer-extra-plugin-stealth')())
 
 const scripts = [
-  'southwest',
-  'skyscanner',
-  'delta',
-  'aviasales',
-  'kayak',
-  'airasia'
+  'southwest.com',
+  'skyscanner.com',
+  'delta.com',
+  'aviasales.ru',
+  'kayak.com',
+  'airasia.com'
 ]
 exports.scripts = scripts
 
@@ -48,7 +48,6 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
   const browser = await createBrowser({
     bin,
     headless: options.headless,
-    slowMo: 33
   })
 
   const page = await browser.newPage()
