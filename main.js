@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron')
+const {app, Tray, Menu, BrowserWindow, ipcMain, nativeImage} = require('electron')
 const url = require('url')
 const path = require('path')
 
@@ -28,13 +28,19 @@ function createWindow() {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    app.quit()
-  })
+  mainWindow.on('minimize',function(event){
+    event.preventDefault();
+    mainWindow.hide();
+  });
+
+  mainWindow.on('close', function (event) {
+    if(!app.isQuiting){
+      event.preventDefault();
+      mainWindow.hide();
+    }
+
+    return false;
+  });
 }
 
 ipcMain.on('add_subscription', function (e, item) {
@@ -44,7 +50,28 @@ ipcMain.on('add_subscription', function (e, item) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', () => {
+  createWindow()
+  createTray()
+})
+
+const createTray = () => {
+  const trayIconPath = path.join(__dirname, 'app/icons/tray.png');
+  let trayIcon = nativeImage.createFromPath(trayIconPath);
+  trayIcon = trayIcon.resize({ width: 16, height: 16 });
+  const tray = new Tray(trayIcon);
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Show App', click:  function(){
+        mainWindow.show();
+      } },
+    { label: 'Quit', click:  function(){
+        app.isQuiting = true;
+        app.quit();
+      } }
+  ]);
+  tray.setContextMenu(contextMenu)
+}
+
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
