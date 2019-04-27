@@ -45,42 +45,6 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
     }
   }
 
-  // NOTE: Demo only
-  if (
-    options.headless &&
-    (
-      subscription.origin.toUpperCase() === 'LAX' || subscription.origin.toUpperCase() === 'NYC'
-    ) && (
-      subscription.destination.toUpperCase() === 'LAX' || subscription.destination.toUpperCase() === 'NYC'
-    )) {
-    const fakePrices = {
-      "southwest.com": 528,
-      "skyscanner.com": 348,
-      "aviasales.ru": 353,
-      "delta.com": 433,
-      "kayak.com": 332
-    }
-
-    const times = {
-      "airasia.com": 21000,
-      "southwest.com": 20000,
-      "skyscanner.com": 44000,
-      "aviasales.ru": 36000,
-      "delta.com": 32000,
-      "kayak.com": 50000,
-    }
-
-    setTimeout(() => {
-      onPrice({
-        script,
-        price: fakePrices[script],
-        id: subscription.id
-      })
-    }, times[script] || 40000 )
-
-    return
-  }
-  // NOTE: Demo end
 
   const browser = await createBrowser({
     bin,
