@@ -35,6 +35,7 @@
   "build": {
     "appId": "com.mutt.app",
     "mac": {
+      "productName": "Mutt",
       "category": "public.app-category.travel",
       "icon": "app/icons/app-icon.png"
     },
