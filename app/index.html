@@ -104,10 +104,18 @@
             line-height: 19px;
         }
 
+        .others {
+            margin-right: -90px;
+        }
+
+        .others > div {
+            display: flex;
+            margin: 15px 0;
+        }
+
         .other-agency {
             cursor: pointer;
             display: block;
-            margin: 15px 0;
             color: #1FAEFF;
             text-decoration: none;
         }
@@ -119,17 +127,22 @@
 
         .other-price {
             font-size: 18px;
-            text-align: right;
             cursor: pointer;
             display: block;
-            margin: 15px 20px 15px 0;
             color: #1FAEFF;
             text-decoration: none;
+            margin: 0 0 0 auto;
         }
 
         .other-price:hover {
             color: #1FAEFF;
             text-decoration: none;
+        }
+
+        .other-price-error {
+            cursor: auto;
+            margin: 15px 20px 15px 0;
+            margin-left: 32px;
         }
 
         .agency-more {
@@ -158,7 +171,6 @@
 
         .best-price > img {
             margin-right: 5px;
-            margin-left: auto;
         }
 
         .controls {
@@ -216,6 +228,7 @@
   const {default: TimeAgo} = require('react-timeago')
   const fs = require('fs')
   const path = require('path')
+  const _ = require('lodash')
 
   const {app} = remote
   const userDataPath = app.getPath('userData')
@@ -425,14 +438,21 @@
             }
 
             {expanded && (
-              Object.entries(prices).map(([a]) => {
-                if (a === agency) {
-                  return null
-                }
-                return (
-                  <a key={a} className="other-agency">{a}</a>
-                )
-              })
+              <div className="others">
+                {_.sortBy(Object.entries(prices), 1).map(([a, p]) => {
+                  if (a === agency) {
+                    return null
+                  }
+                  return (
+                    <div>
+                      <a key={a} className="other-agency">{a}</a>
+                      {p
+                        ? <a key={a} className="other-price">${p} <img src="icons/external.svg" alt=""/></a>
+                        : <img className="other-price-error" src="icons/error.svg" alt=""/>}
+                    </div>
+                  )
+                })}
+              </div>
             )}
           </td>
 
@@ -443,22 +463,6 @@
                 : <img src="icons/no-notify.svg" alt="" onClick={e => onMute(e, id)}/>}
               <div className="value">${price}</div>
             </div>
-
-            {expanded && (
-              Object.entries(prices).map(([a, price]) => {
-                if (a === agency) {
-                  return null
-                }
-                if (!price) {
-                  return (
-                    <img src="icons/error.svg" alt=""/>
-                  )
-                }
-                return (
-                  <a key={a} className="other-price">${price} <img src="icons/external.svg" alt=""/></a>
-                )
-              })
-            )}
           </td>
 
           <td>
