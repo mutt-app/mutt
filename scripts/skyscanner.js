@@ -115,7 +115,7 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
     }
   }
 
-  await delay(20000)
+  await delay(30000)
   const cheapestPriceElement = await page.$('[data-tab="price"] .fqs-price')
   const price = await (await cheapestPriceElement.getProperty('textContent')).jsonValue()
 

@@ -3,7 +3,9 @@ const {delay, parsePrice} = require('.')
 module.exports = async ({page, origin, destination, departDate, returnDate}) => {
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36')
 
-  // TODO: use departDate/returnDate
+  const departDateString = toISOString(departDate)
+  const returnDateString = toISOString(returnDate)
+
   // Going to airasia
   await page.goto('https://www.airasia.com/en/gb')
   await delay(3000)
@@ -58,7 +60,7 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
   await page.focus('#home-depart-date-heatmap')
   await page.keyboard.press('Backspace')
   await delay(200)
-  await page.type('#home-depart-date-heatmap', '03/05/2019')
+  await page.type('#home-depart-date-heatmap', departDateString)
   await delay(200)
   await page.keyboard.press('Tab')
 
@@ -69,7 +71,7 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
   await page.focus('#home-return-date-heatmap')
   await page.keyboard.press('Backspace')
   await delay(200)
-  await page.type('#home-return-date-heatmap', '06/06/2019')
+  await page.type('#home-return-date-heatmap', returnDateString)
   await delay(200)
   await page.keyboard.press('Tab')
 
@@ -89,6 +91,17 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
   return parseAirasiaPrice(val)
 }
 
+
+function toISOString(date) {
+  return  pad(date.getDate()) + '/' + pad(date.getMonth() + 1) + '/' + date.getFullYear()
+}
+
+function pad(number) {
+  if (number < 10) {
+    return '0' + number;
+  }
+  return number;
+}
 
 function parseAirasiaPrice(price) {
   return parsePrice(price.split(".")[0])

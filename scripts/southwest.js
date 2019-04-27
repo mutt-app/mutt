@@ -75,7 +75,7 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
 
   // Getting min depart price
   let minDepartPrice = 0
-  const departPrices = await page.$$('div[id^="air-booking-fares-0"] .fare-button_primary-yellow .fare-button--value-total')
+  const departPrices = await page.$$('div[id^="air-booking-fares-0"] .fare-button--value-total')
   for (let i = 0; i < departPrices.length; i++) {
     let val = await page.evaluate(
       span => span.innerText,
@@ -88,7 +88,7 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
   }
 
   let minReturnPrice = 0
-  const returnPrices = await page.$$('div[id^="air-booking-fares-1"] .fare-button_primary-yellow .fare-button--value-total')
+  const returnPrices = await page.$$('div[id^="air-booking-fares-1"] .fare-button--value-total')
   for (let i = 0; i < returnPrices.length; i++) {
     let val = await page.evaluate(
       span => span.innerText,

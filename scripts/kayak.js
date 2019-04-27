@@ -62,7 +62,7 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
   await delay(500)
   await searchButton.click()
 
-  await delay(30000)
+  await delay(35000)
   const prices = await page.$$('span[class^="price option-text"]')
   let cheapestReturnPrice = undefined
   for (let priceElement of prices) {

@@ -20,7 +20,7 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
       currencies[i].click()
     }
   }
-  await delay(30000)
+  await delay(35000)
   const priceElement = await page.$('div[class="minimized-calendar-matrix__item is-current"] span[class="price --usd"]')
   let val = await page.evaluate(
     span => span.innerText,

@@ -77,12 +77,17 @@ module.exports = async ({page, origin, destination, departDate, returnDate}) => 
   await cheapestDepartPriceElement.hover()
   await page.mouse.down()
   await page.mouse.up()
-  await delay(1000)
+  await delay(3000)
 
-  await page.click('#accept_restrictions')
-  await delay(100)
+  const acceptRestrictions = await page.$('#accept_restrictions')
+  if (acceptRestrictions !== null) {
+    acceptRestrictions.click()
+    await delay(100)
+    await page.click('.continue-to-basic a')
+    await delay(100)
+  }
 
-  await page.click('.continue-to-basic a')
+
 
   // Return flight
   await page.waitForSelector('.select-outbound')
