@@ -30,9 +30,6 @@ module.exports = async ({page, origin, destination, departDate, returnDate, goto
   // Choosing first segment
   // Opening calendar
   await page.evaluate((selector) => document.querySelector(selector).click(), '#depart-fsc-datepicker-button')
-  if (goto) {
-    return
-  }
 
   await page.waitForSelector('#depart-calendar__bpk_calendar_nav_select')
 
@@ -117,6 +114,10 @@ module.exports = async ({page, origin, destination, departDate, returnDate, goto
     if (ariaLabel !== null && ariaLabel.toString() === 'Search flights') {
       buttons[i].click()
     }
+  }
+
+  if (goto) {
+    return
   }
 
   await delay(30000)
