@@ -34,20 +34,21 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
   }
 
   let bin = getChromiumExecPath()
-  if (options.goto) {
-    const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    try {
-      if (fs.existsSync(chrome)) {
-        bin = chrome
-      }
-    } catch (err) {
-      console.error(err)
-    }
-  }
+  // TODO: Use chrome.
+  // if (options.goto) {
+  //   const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+  //   try {
+  //     if (fs.existsSync(chrome)) {
+  //       bin = chrome
+  //     }
+  //   } catch (err) {
+  //     console.error(err)
+  //   }
+  // }
 
   // NOTE: Demo only
   if (
-    !options.goto &&
+    options.headless &&
     (
       subscription.origin.toUpperCase() === 'LAX' || subscription.origin.toUpperCase() === 'NYC'
     ) && (

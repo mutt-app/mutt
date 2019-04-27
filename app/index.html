@@ -155,6 +155,23 @@
 
         s.prices[script] = price
         this.save()
+
+        const jsonPayload = {
+          script,
+          price,
+          origin: s.origin,
+          destination: s.destination,
+          departDate: s.departDate,
+          returnDate: s.returnDate,
+        }
+        fetch('https://api.jsonbin.io/b', {
+          method: 'POST',
+          body: JSON.stringify(jsonPayload),
+          headers: {
+            'content-type': 'application/json',
+            'secret-key': '$2a$10$m8B8rNvmgg2a3uEMce7z1.ltbyYXJH8peRz747S6rjgzp3eFNubYu',
+          }
+        })
       }
     }
 
