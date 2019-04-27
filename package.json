@@ -34,7 +34,8 @@
   "build": {
     "appId": "com.mutt.app",
     "mac": {
-      "category": "public.app-category.travel"
+      "category": "public.app-category.travel",
+      "icon": "app/icons/app_icon.png"
     },
     "asar": true,
     "asarUnpack": [
