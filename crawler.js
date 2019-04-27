@@ -1,3 +1,4 @@
+const fs = require('fs')
 const puppeteer = require('puppeteer-extra')
 puppeteer.use(require('puppeteer-extra-plugin-stealth')())
 
@@ -17,7 +18,7 @@ exports.crawlAll = function crawlAll(subscription, onPrice, options = {}) {
 
   let i = 0
   for (let script of scripts) {
-    setTimeout(() => crawl(subscription, script, onPrice, options),  i * 1000)
+    setTimeout(() => crawl(subscription, script, onPrice, options), i * 1000)
     i++
   }
 }
@@ -32,7 +33,20 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
     ...options
   }
 
+  let bin = getChromiumExecPath()
+  if (options.goto) {
+    const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+    try {
+      if (fs.existsSync(chrome)) {
+        bin = chrome
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const browser = await createBrowser({
+    bin,
     headless: options.headless,
     slowMo: 33
   })
@@ -74,7 +88,7 @@ exports.crawl = async function crawl(subscription, script, onPrice, options = {}
 function createBrowser(options = {}) {
   return puppeteer.launch({
     ...options,
-    executablePath: getChromiumExecPath()
+    executablePath: options['bin'] || getChromiumExecPath(),
   })
 }
 
