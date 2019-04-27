@@ -32,10 +32,10 @@ function createWindow() {
   // mainWindow.webContents.openDevTools()
 
   // Continue to handle mainWindow "close" event here
-  mainWindow.on('close', function(e){
-    if(!app.isQuiting){
+  mainWindow.on('close', function (e) {
+    if (!app.isQuiting) {
       e.preventDefault()
-      mainWindow.hide();
+      mainWindow.hide()
     } else {
       app.quit()
     }
@@ -57,35 +57,39 @@ app.on('ready', () => {
   app.on('before-quit', function (e) {
     // Handle menu-item or keyboard shortcut quit here
     app.isQuiting = true
-  });
+  })
 
-  app.on('activate-with-no-open-windows', function(){
-    mainWindow.show();
-  });
+  app.on('activate-with-no-open-windows', function () {
+    mainWindow.show()
+  })
 })
 
 // This is another place to handle events after all windows are closed
 app.on('will-quit', function () {
   // This is a good place to add tests insuring the app is still
   // responsive and all windows are closed.
-  mainWindow = null;
-});
+  mainWindow = null
+})
 
 const createTray = () => {
-  const trayIconPath = path.join(__dirname, 'app/icons/tray.png');
-  let trayIcon = nativeImage.createFromPath(trayIconPath);
-  trayIcon = trayIcon.resize({ width: 16, height: 16 });
-  const tray = new Tray(trayIcon);
+  const {darkMode} = require('electron-util')
+  const trayIconPath = path.join(__dirname, darkMode.isEnabled ? 'app/icons/dog_white.png' : 'app/icons/dog_black.png')
+  let trayIcon = nativeImage.createFromPath(trayIconPath)
+  trayIcon = trayIcon.resize({width: 16, height: 16})
+  const tray = new Tray(trayIcon)
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Show App', click:  function(){
-        mainWindow.show();
-      } },
-    { label: 'Quit', click:  function(){
+    {
+      label: 'Show App', click: function () {
+        mainWindow.show()
+      }
+    },
+    {
+      label: 'Quit', click: function () {
         app.isQuiting = true
         app.quit()
       }
     }
-  ]);
+  ])
   tray.setContextMenu(contextMenu)
 }
 
@@ -101,7 +105,7 @@ app.on('activate', function () {
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
     createWindow()
-  }  else {
+  } else {
     mainWindow.show()
   }
 })

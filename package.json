@@ -22,6 +22,7 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "electron-context-menu": "^0.12.0",
+    "electron-util": "^0.11.0",
     "jquery": "^3.4.0",
     "lodash": "^4.17.11",
     "puppeteer": "latest",
@@ -35,7 +36,7 @@
     "appId": "com.mutt.app",
     "mac": {
       "category": "public.app-category.travel",
-      "icon": "app/icons/app_icon.png"
+      "icon": "app/icons/app-icon.png"
     },
     "asar": true,
     "asarUnpack": [
