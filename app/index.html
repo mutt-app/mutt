@@ -6,7 +6,7 @@
     <script src="https://unpkg.com/react@16.8/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16.8/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&amp;subset=cyrillic" rel="stylesheet">
     <style>
         html {
             box-sizing: border-box;
@@ -99,7 +99,7 @@
         .agency {
             min-width: 140px;
             font-size: 14px;
-            font-weight: 800;
+            font-weight: 600;
             line-height: 19px;
         }
 
@@ -121,7 +121,7 @@
             text-align: right;
             cursor: pointer;
             display: block;
-            margin: 15px 42px 15px 0;
+            margin: 15px 20px 15px 0;
             color: #1FAEFF;
             text-decoration: none;
         }
@@ -152,10 +152,12 @@
             line-height: 35px;
             letter-spacing: 0.05em;
             text-transform: uppercase;
+            margin-right: 20px;
         }
 
         .best-price > img {
             margin-right: 5px;
+            margin-left: auto;
         }
 
         .controls {
@@ -178,6 +180,11 @@
             letter-spacing: 0.1em;
             text-transform: uppercase;
             cursor: pointer;
+            transition: transform 200ms;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
         }
 
         img {
@@ -189,6 +196,11 @@
             bottom: 0;
             cursor: pointer;
             left: calc(50% - 33px);
+            transition: transform 200ms;
+        }
+
+        .add-subscription:hover {
+            transform: scale(1.1);
         }
     </style>
 </head>
